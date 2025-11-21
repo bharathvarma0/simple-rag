@@ -61,6 +61,13 @@ class RetrievalConfig:
 
 
 @dataclass
+class MemoryConfig:
+    """Configuration for conversational memory"""
+    history_window_size: int = 5  # Number of turns to keep
+    enabled: bool = True
+
+
+@dataclass
 class DataConfig:
     """Configuration for data paths"""
     data_dir: str = "data/pdfs"
@@ -75,6 +82,7 @@ class Settings:
     vector_store: VectorStoreConfig = field(default_factory=VectorStoreConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
     retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
+    memory: MemoryConfig = field(default_factory=MemoryConfig)
     data: DataConfig = field(default_factory=DataConfig)
     
     def __post_init__(self):

@@ -82,11 +82,25 @@ Answer:"""
         Returns:
             Formatted prompt
         """
-        prompt = f"""Extract {extraction_type} from the following context:
+    @staticmethod
+    def rewrite_prompt(history: str, question: str) -> str:
+        """
+        Generate query rewrite prompt
+        
+        Args:
+            history: Conversation history
+            question: User question
+            
+        Returns:
+            Formatted prompt
+        """
+        prompt = f"""Given the following conversation history and a follow-up question, rephrase the follow-up question to be a standalone question.
+        
+Chat History:
+{history}
 
-Context:
-{context}
+Follow-up Question: {question}
 
-{extraction_type.capitalize()}:"""
+Standalone Question:"""
         return prompt
 
