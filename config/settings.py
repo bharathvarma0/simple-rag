@@ -30,7 +30,8 @@ class ChunkingConfig:
 class VectorStoreConfig:
     """Configuration for vector store"""
     persist_dir: str = "vector_store"
-    index_type: str = "flat"  # FAISS index type: flat, ivf, etc.
+    index_type: str = "hnsw"  # Options: "flat", "hnsw"
+    hnsw_m: int = 32  # Number of connections per node for HNSW
 
 
 @dataclass
