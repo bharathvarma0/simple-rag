@@ -79,6 +79,11 @@ class VectorDatabase:
         # Add to index
         self.add_embeddings(embeddings.astype('float32'), metadatas)
         
+        # Build Keyword DB (BM25)
+        from augmentation.keyword_db import KeywordDatabase
+        self.keyword_db = KeywordDatabase(self.persist_dir)
+        self.keyword_db.build_from_documents(chunks)
+        
         # Save
         self.save()
         logger.info("Vector database built and saved")

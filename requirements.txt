@@ -1,20 +1,8 @@
-# Core LangChain libraries
 langchain
-langchain-core
-langchain-community
-
-# Document loaders
+sentence-transformers
+faiss-cpu
+langchain-groq
 pypdf
 pymupdf
-
-# Embeddings
-sentence-transformers
-
-# Vector stores
-faiss-cpu
-
-# LLM providers
-langchain-groq
-
-# Utilities
+rank_bm25
 python-dotenv
