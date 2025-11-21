@@ -26,7 +26,7 @@ We replaced the "Brute Force" search (`IndexFlatL2`) with a "Graph-based" search
 ---
 
 ## 🔍 Update 2: Hybrid Search Implementation
-**Commit ID:** `[Current]`
+**Commit ID:** `062726c`
 **Goal:** Make the system more accurate for specific searches (like "Article 5.2").
 
 ### What Changed?
@@ -50,6 +50,27 @@ We added **Keyword Search (BM25)** to work alongside the AI Vector Search. We co
 | :--- | :--- | :--- |
 | **Old (Vector)** | *Generic Engine Rules* | It understood "fuel" but missed "Article 5.2". |
 | **New (Hybrid)** | **Article 5.2: Fuel Flow** | The Keyword search found "Article 5.2" instantly. |
+
+---
+
+## 🧠 Update 3: Conversational Memory
+**Commit ID:** `[Current]`
+**Goal:** Allow the bot to understand follow-up questions (Context).
+
+### What Changed?
+We added a **Query Rewriting** layer. Before searching, the AI looks at your chat history and rewrites your question to be complete.
+
+### Simple Explanation
+- **Before:** If you asked "How much does it cost?", the bot didn't know what "it" was.
+- **After:** The bot remembers you were talking about "Engines" and changes your question to "How much does the Engine cost?" automatically.
+
+### Comparison Table
+
+| Feature | Before (Amnesia) | After (Memory) |
+| :--- | :--- | :--- |
+| **Follow-up Questions** | Failed ("I don't know what 'it' is") | Works perfectly |
+| **Context** | Zero (Every question is new) | 5-Turn History Window |
+| **Mechanism** | Direct Search | Rewrite → Search |
 
 ---
 
