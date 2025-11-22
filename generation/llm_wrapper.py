@@ -4,8 +4,7 @@ LLM wrapper for different providers
 
 import os
 from typing import Optional, List, Dict, Any
-from langchain_groq import ChatGroq
-from langchain_openai import ChatOpenAI
+# Imports moved to _initialize_llm to avoid hard dependencies
 
 from config import get_settings
 
@@ -44,13 +43,14 @@ class LLMWrapper:
     
     def _initialize_llm(self):
         """Initialize LLM client"""
-        if not self.api_key:
+        if not self.api_key and self.provider.lower() != "ollama":
             raise ValueError(
                 f"{self.provider.upper()}_API_KEY not found. "
                 "Set it as environment variable or pass as parameter."
             )
         
         if self.provider.lower() == "groq":
+            from langchain_groq import ChatGroq
             self._llm = ChatGroq(
                 groq_api_key=self.api_key,
                 model_name=self.model_name,
@@ -58,11 +58,19 @@ class LLMWrapper:
                 max_tokens=self.max_tokens
             )
         elif self.provider.lower() == "openai":
+            from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 openai_api_key=self.api_key,
                 model_name=self.model_name,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens
+            )
+        elif self.provider.lower() == "ollama":
+            from langchain_community.chat_models import ChatOllama
+            self._llm = ChatOllama(
+                model=self.model_name,
+                temperature=self.temperature,
+                base_url=self.settings.llm.base_url
             )
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")

@@ -6,3 +6,6 @@ pypdf
 pymupdf
 rank_bm25
 python-dotenv
+langchain-community
+langchain-text-splitters
+langchain-openai

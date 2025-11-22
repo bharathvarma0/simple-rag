@@ -37,11 +37,12 @@ class VectorStoreConfig:
 @dataclass
 class LLMConfig:
     """Configuration for LLM"""
-    provider: str = "groq"  # groq, openai, etc.
-    model_name: str = "gemma2-9b-it"
+    provider: str = "ollama"  # groq, openai, ollama
+    model_name: str = "llama3.2"
     temperature: float = 0.1
-    max_tokens: int = 1024
+    max_tokens: int = 2048
     api_key: Optional[str] = None
+    base_url: str = "http://localhost:11434"  # Default Ollama URL
     
     def __post_init__(self):
         """Load API key from environment if not provided"""
