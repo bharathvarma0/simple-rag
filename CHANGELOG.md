@@ -54,7 +54,7 @@ We added **Keyword Search (BM25)** to work alongside the AI Vector Search. We co
 ---
 
 ## 🧠 Update 3: Conversational Memory
-**Commit ID:** `[Current]`
+**Commit ID:** `64e0643`
 **Goal:** Allow the bot to understand follow-up questions (Context).
 
 ### What Changed?

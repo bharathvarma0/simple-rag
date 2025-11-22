@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  rag-app:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./vector_store:/app/vector_store
+      - ./.env:/app/.env
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: tail -f /dev/null  # Keep container running for interactive use via exec
+
+  # Optional: Run Ollama in a container if not running on host
+  # ollama:
+  #   image: ollama/ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+
+# volumes:
+#   ollama_data:
