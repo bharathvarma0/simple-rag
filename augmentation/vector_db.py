@@ -79,6 +79,11 @@ class VectorDatabase:
         # Add to index
         self.add_embeddings(embeddings.astype('float32'), metadatas)
         
+        # Build Keyword DB (BM25)
+        from augmentation.keyword_db import KeywordDatabase
+        self.keyword_db = KeywordDatabase(self.persist_dir)
+        self.keyword_db.build_from_documents(chunks)
+        
         # Save
         self.save()
         logger.info("Vector database built and saved")
@@ -94,7 +99,21 @@ class VectorDatabase:
         dim = embeddings.shape[1]
         
         if self.index is None:
-            self.index = faiss.IndexFlatL2(dim)
+            settings = get_settings()
+            index_type = settings.vector_store.index_type
+            
+            if index_type == "hnsw":
+                # HNSW index (Graph-based, fast approximate search)
+                # M is the number of neighbors used in the graph. Higher M = more accurate but slower build.
+                M = settings.vector_store.hnsw_m
+                self.index = faiss.IndexHNSWFlat(dim, M)
+                self.index.hnsw.efConstruction = 40  # Depth of search during build
+                self.index.hnsw.efSearch = 16        # Depth of search during query
+                logger.info(f"Created HNSW index with M={M}")
+            else:
+                # Fallback to Flat L2 (Brute force, exact search)
+                self.index = faiss.IndexFlatL2(dim)
+                logger.info("Created Flat L2 index")
         
         self.index.add(embeddings)
         
