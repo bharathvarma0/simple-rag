@@ -1,5 +1,6 @@
 """
 Application settings and configuration
+Simplified for adaptive RAG system
 """
 
 import os
@@ -17,14 +18,6 @@ class EmbeddingConfig:
     model_name: str = "all-MiniLM-L6-v2"
     dimension: int = 384  # Will be set automatically based on model
     
-    
-@dataclass
-class ChunkingConfig:
-    """Configuration for text chunking"""
-    chunk_size: int = 1000
-    chunk_overlap: int = 200
-    separators: list = field(default_factory=lambda: ["\n\n", "\n", " ", ""])
-
 
 @dataclass
 class VectorStoreConfig:
@@ -32,40 +25,6 @@ class VectorStoreConfig:
     persist_dir: str = "vector_store"
     index_type: str = "hnsw"  # Options: "flat", "hnsw"
     hnsw_m: int = 32  # Number of connections per node for HNSW
-
-
-@dataclass
-class LLMConfig:
-    """Configuration for LLM"""
-    provider: str = "ollama"  # groq, openai, ollama
-    model_name: str = "llama3.2"
-    temperature: float = 0.1
-    max_tokens: int = 2048
-    api_key: Optional[str] = None
-    base_url: str = "http://localhost:11434"  # Default Ollama URL
-    
-    def __post_init__(self):
-        """Load API key from environment if not provided"""
-        if self.api_key is None:
-            if self.provider == "groq":
-                self.api_key = os.getenv("GROQ_API_KEY")
-            elif self.provider == "openai":
-                self.api_key = os.getenv("OPENAI_API_KEY")
-
-
-@dataclass
-class RetrievalConfig:
-    """Configuration for retrieval"""
-    top_k: int = 5
-    similarity_threshold: float = 0.0
-    distance_metric: str = "L2"  # L2, cosine, etc.
-
-
-@dataclass
-class MemoryConfig:
-    """Configuration for conversational memory"""
-    history_window_size: int = 5  # Number of turns to keep
-    enabled: bool = True
 
 
 @dataclass
@@ -79,11 +38,7 @@ class DataConfig:
 class Settings:
     """Main application settings"""
     embedding: EmbeddingConfig = field(default_factory=EmbeddingConfig)
-    chunking: ChunkingConfig = field(default_factory=ChunkingConfig)
     vector_store: VectorStoreConfig = field(default_factory=VectorStoreConfig)
-    llm: LLMConfig = field(default_factory=LLMConfig)
-    retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
-    memory: MemoryConfig = field(default_factory=MemoryConfig)
     data: DataConfig = field(default_factory=DataConfig)
     
     def __post_init__(self):

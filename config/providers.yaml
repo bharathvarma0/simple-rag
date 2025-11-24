@@ -1,0 +1,39 @@
+# Provider Configuration
+# Controls which LLM and embedding providers are used
+
+providers:
+  llm:
+    # Priority order - system will try in order until one works
+    priority:
+      - ollama
+      - groq
+      - openai
+    
+    ollama:
+      model: "llama3.2"
+      base_url: "http://localhost:11434"
+      enabled: true
+      
+    groq:
+      model: "llama-3.1-70b-versatile"
+      api_key_env: "GROQ_API_KEY"
+      enabled: true
+      
+    openai:
+      model: "gpt-4-turbo-preview"
+      api_key_env: "OPENAI_API_KEY"
+      enabled: false
+  
+  embedding:
+    priority:
+      - local
+      - openai
+    
+    local:
+      model: "all-MiniLM-L6-v2"
+      enabled: true
+      
+    openai:
+      model: "text-embedding-3-large"
+      api_key_env: "OPENAI_API_KEY"
+      enabled: false

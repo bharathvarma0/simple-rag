@@ -1,11 +1,31 @@
+# Python dependencies for Adaptive RAG System v2
+
+# Core dependencies
 langchain
-sentence-transformers
-faiss-cpu
-langchain-groq
-pypdf
-pymupdf
-rank_bm25
-python-dotenv
 langchain-community
 langchain-text-splitters
-langchain-openai
+sentence-transformers
+faiss-cpu
+python-dotenv
+pyyaml
+
+# Document processing
+pypdf
+pymupdf
+
+# Search
+rank_bm25
+
+# LLM providers (optional - install as needed)
+langchain-groq      # For Groq API
+langchain-openai    # For OpenAI API
+groq                # Groq SDK
+openai              # OpenAI SDK
+
+# Web framework (for future API endpoints)
+# fastapi
+# uvicorn
+
+# Testing
+# pytest
+# pytest-asyncio

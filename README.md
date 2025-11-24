@@ -1,233 +1,258 @@
-# Traditional RAG System
+# Adaptive RAG System
 
-A clean, modular implementation of a Retrieval-Augmented Generation (RAG) system for document question-answering.
+A production-ready, adaptive Retrieval-Augmented Generation (RAG) system with intelligent query routing, YAML-based configuration, and provider abstraction for seamless migration between local and cloud LLMs.
 
-## 📁 Project Structure
+## 🎯 Key Features
 
-```
-RAG-Tutorials/
-├── components/              # Reusable components
-│   ├── __init__.py
-│   ├── loaders.py          # Document loaders (PDF, TXT, CSV, etc.)
-│   ├── chunkers.py         # Text chunking utilities
-│   └── embedders.py        # Embedding generation
-├── data/                   # Data storage
-│   └── pdfs/              # Place your PDF files here
-├── data_ingestion/         # Data ingestion scripts
-│   ├── __init__.py
-│   └── ingest.py          # Main ingestion script
-├── augmentation/          # Vector database and similarity search
-│   ├── __init__.py
-│   ├── vector_db.py      # FAISS vector database management
-│   └── search.py         # Similarity search utilities
-├── generation/            # LLM generation
-│   ├── __init__.py
-│   └── rag.py            # RAG pipeline (retrieval + generation)
-├── vector_store/         # Generated vector store (created automatically)
-├── app.py                # Main application entry point
-├── requirements.txt      # Python dependencies
-└── README.md            # This file
-```
+- **Adaptive Query Routing**: Automatically classifies queries and routes to optimal strategies
+- **5 Specialized Strategies**: Fact retrieval, summarization, comparison, reasoning - each with tuned parameters
+- **YAML Configuration**: Industry-standard config management (no code changes to adjust parameters)
+- **Provider Abstraction**: Easy switching between Ollama (local), Groq, and OpenAI
+- **Hybrid Approach**: YAML configs with hardcoded fallbacks for reliability
+- **Performance Tracking**: Built-in metrics and monitoring
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 1. Installation
+### Prerequisites
+- Python 3.11+
+- Ollama (for local LLM) OR Groq/OpenAI API key
+- Your documents in `data/pdfs/`
+
+### Installation
 
 ```bash
 # Install dependencies
 pip install -r requirements.txt
+
+# Build vector store (one-time setup)
+python -c "from data_ingestion.ingest import ingest_documents; from augmentation.vector_db import VectorDatabase; docs, chunks = ingest_documents(); vdb = VectorDatabase(); vdb.build_from_documents(docs)"
 ```
 
-### 2. Set Environment Variables
+### Usage
 
-Create a `.env` file in the root directory:
-
-```env
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-Get your API key from: https://console.groq.com/
-
-### 3. Add Your Documents
-
-Place your PDF files (or other supported formats) in the `data/pdfs/` directory:
-
+#### Quick Test
 ```bash
-mkdir -p data/pdfs
-# Copy your PDF files to data/pdfs/
+python test_adaptive.py
 ```
 
-### 4. Build Vector Store
-
+#### Full Evaluation
 ```bash
-# Build vector store from documents
-python app.py --build --data-dir data/pdfs
+python evaluation/evaluate_adaptive.py
 ```
 
-### 5. Query the System
-
-```bash
-# Query with a question
-python app.py --query "What is attention mechanism?"
-
-# Interactive mode (default)
-python app.py
-```
-
-## 📖 Usage
-
-### Command Line Interface
-
-```bash
-# Build vector store
-python app.py --build
-
-# Query with specific question
-python app.py --query "Your question here"
-
-# Query with custom top-k
-python app.py --query "Your question" --top-k 3
-
-# Interactive mode
-python app.py
-```
-
-### Python API
-
+#### Use in Code
 ```python
-from generation.rag import RAGPipeline
+from adaptive_rag import AdaptiveRAGPipeline
 
-# Initialize RAG pipeline
-rag = RAGPipeline(persist_dir="vector_store")
+# Initialize
+rag = AdaptiveRAGPipeline()
 
-# Query the system
-result = rag.query("What is your question?", top_k=5)
+# Query (automatic strategy selection)
+result = rag.query("What is the maximum fuel flow rate?")
 
-# Get answer
-answer = result["answer"]
-sources = result["sources"]
-context = result["context"]
-
-# Simple query (just answer)
-answer = rag.ask("What is your question?")
+print(result['answer'])
+print(f"Strategy: {result['strategy']}")
+print(f"Query type: {result['query_profile']['query_type']}")
 ```
 
-### Build Vector Store Programmatically
+## 📊 How It Works
 
-```python
-from data_ingestion.ingest import ingest_documents
-from augmentation.vector_db import VectorDatabase
-
-# Ingest documents
-raw_docs, chunks = ingest_documents("data/pdfs")
-
-# Build vector database
-vector_db = VectorDatabase(persist_dir="vector_store")
-vector_db.build_from_documents(raw_docs)
+```
+User Question
+     ↓
+Query Analyzer (classifies: fact/summary/comparison/reasoning)
+     ↓
+Strategy Selector (routes to optimal strategy)
+     ↓
+Strategy Execution (loads params from YAML, retrieves documents)
+     ↓
+Result + Metrics
 ```
 
-## 🧩 Components
+### Strategies
 
-### Document Loaders (`components/loaders.py`)
-- Supports: PDF, TXT, CSV, Excel (.xlsx), Word (.docx), JSON
-- Automatically finds and loads all supported files from directory
-
-### Text Chunkers (`components/chunkers.py`)
-- Splits documents into smaller chunks
-- Configurable chunk size and overlap
-
-### Embedding Generators (`components/embedders.py`)
-- Uses SentenceTransformer models
-- Default: `all-MiniLM-L6-v2` (384 dimensions)
-
-### Vector Database (`augmentation/vector_db.py`)
-- FAISS-based vector storage
-- Persistent storage to disk
-- Automatic loading and saving
-
-### Similarity Search (`augmentation/search.py`)
-- Semantic search in vector database
-- Returns top-k similar documents
-- Configurable similarity thresholds
-
-### RAG Pipeline (`generation/rag.py`)
-- Traditional RAG: Retrieve → Generate
-- Uses Groq LLM for generation
-- Returns answers with source citations
+| Strategy | Query Type | top_k | Use Case |
+|----------|-----------|-------|----------|
+| **Simple Fact** | fact (simple) | 3 | "What is X?" |
+| **Complex Fact** | fact (complex) | 10 | "What are all details about X?" |
+| **Summary** | summary | 30 | "Summarize X" |
+| **Comparison** | comparison | 20 | "Compare X and Y" |
+| **Reasoning** | reasoning | 15 | "How does X affect Y?" |
 
 ## ⚙️ Configuration
 
-### Vector Store Settings
+### Provider Configuration (`config/providers.yaml`)
 
-Edit `augmentation/vector_db.py`:
-- `persist_dir`: Directory for vector store
-- `embedding_model`: Embedding model name
+Switch LLM providers without code changes:
 
-### Chunking Settings
+```yaml
+providers:
+  llm:
+    priority: [ollama, groq, openai]  # Try in order
+```
 
-Edit `data_ingestion/ingest.py`:
-- `chunk_size`: Size of text chunks (default: 1000)
-- `chunk_overlap`: Overlap between chunks (default: 200)
+**Local Development:**
+```yaml
+priority: [ollama]
+```
 
-### LLM Settings
+**Production:**
+```yaml
+priority: [groq, openai]
+```
 
-Edit `generation/rag.py`:
-- `llm_model`: Groq model name (default: `gemma2-9b-it`)
-- `temperature`: LLM temperature (default: 0.1)
-- `max_tokens`: Maximum tokens (default: 1024)
+### Strategy Configuration (`config/strategies.yaml`)
 
-## 📝 Supported File Formats
+Tune strategy parameters without code changes:
 
-- **PDF** (`.pdf`) - Using PyPDFLoader
-- **Text** (`.txt`) - Using TextLoader
-- **CSV** (`.csv`) - Using CSVLoader
-- **Excel** (`.xlsx`) - Using UnstructuredExcelLoader
-- **Word** (`.docx`) - Using Docx2txtLoader
-- **JSON** (`.json`) - Using JSONLoader
+```yaml
+simple_fact:
+  top_k: 3
+  temperature: 0.0
+  max_tokens: 500
 
-## 🔧 Dependencies
+summary:
+  top_k: 30
+  temperature: 0.2
+  max_tokens: 2048
+```
 
-- `langchain` - Document processing framework
-- `sentence-transformers` - Embedding generation
-- `faiss-cpu` - Vector database
-- `langchain-groq` - Groq LLM integration
-- `pypdf` / `pymupdf` - PDF processing
+**To change parameters**: Just edit the YAML file - no redeployment needed!
 
-## 📋 Workflow
+### Environment Variables (`.env`)
 
-1. **Data Ingestion**: Load documents from `data/pdfs/`
-2. **Chunking**: Split documents into smaller pieces
-3. **Embedding**: Generate vector embeddings
-4. **Vector Storage**: Store in FAISS database
-5. **Query**: User asks a question
-6. **Retrieval**: Find similar documents
-7. **Generation**: LLM generates answer from context
-8. **Response**: Return answer with sources
+```bash
+GROQ_API_KEY=your_groq_key_here
+OPENAI_API_KEY=your_openai_key_here
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+## 🐳 Docker Deployment
+
+```bash
+# Build
+docker-compose build
+
+# Run
+docker-compose up -d
+
+# Test
+docker-compose exec rag-app python test_adaptive.py
+
+# Evaluate
+docker-compose exec rag-app python evaluation/evaluate_adaptive.py
+```
+
+## 📁 Project Structure
+
+```
+rag-project/
+├── core/                    # Core architecture
+│   ├── query_analyzer.py    # Query classification
+│   ├── strategy_selector.py # Strategy routing
+│   └── metrics.py           # Performance tracking
+├── providers/               # LLM provider abstraction
+│   ├── ollama_provider.py   # Local Ollama
+│   ├── groq_provider.py     # Groq API
+│   └── openai_provider.py   # OpenAI API
+├── strategies/              # Specialized strategies (YAML-configured)
+│   ├── fact_strategy.py     # Fact retrieval
+│   ├── summary_strategy.py  # Summarization
+│   ├── comparison_strategy.py # Comparison
+│   └── reasoning_strategy.py  # Reasoning
+├── config/                  # Configuration
+│   ├── providers.yaml       # Provider selection
+│   └── strategies.yaml      # Strategy parameters
+├── adaptive_rag.py          # Main pipeline
+├── test_adaptive.py         # Quick test
+└── evaluation/              # Evaluation scripts
+    ├── questions.py         # Test questions
+    └── evaluate_adaptive.py # Evaluation runner
+```
+
+## 📈 Performance
+
+Expected accuracy improvements over v1:
+- **Overall**: 46% → 65-75% (+19-29%)
+- **Fact Retrieval**: 56% → 70-80%
+- **Context Understanding**: 35% → 55-65%
+- **Summarization**: 40-46% → 60-70%
+
+## 🔧 Customization
+
+### Add New Strategy
+1. Create new strategy in `strategies/`
+2. Inherit from `BaseStrategy`
+3. Implement `get_params()` and `_generate_prompt()`
+4. Add to `config/strategies.yaml`
+5. Register in `adaptive_rag.py`
+
+### Add New Provider
+1. Create provider in `providers/`
+2. Inherit from `BaseLLMProvider`
+3. Implement `generate()` and `is_available()`
+4. Add to `config/providers.yaml`
+
+### Tune Parameters
+Edit `config/strategies.yaml`:
+```yaml
+simple_fact:
+  top_k: 5  # Change from 3 to 5
+  temperature: 0.1  # Adjust temperature
+```
+
+## 📚 Documentation
+
+- [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) - Detailed implementation plan and architecture
+- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Quick technical overview
+
+## 🛠️ Development
+
+### Run Tests
+```bash
+python test_adaptive.py
+```
+
+### Run Evaluation
+```bash
+python evaluation/evaluate_adaptive.py
+```
+
+### Check Logs
+Logs are output to console with detailed information about query classification, strategy selection, and retrieval.
 
 ## 🐛 Troubleshooting
 
-### Vector Store Not Found
-```bash
-# Build the vector store first
-python app.py --build
-```
+### Ollama not available
+- Ensure Ollama is running: `ollama serve`
+- Check connection: `curl http://localhost:11434/api/tags`
 
-### GROQ_API_KEY Not Found
-```bash
-# Create .env file with your API key
-echo "GROQ_API_KEY=your_key_here" > .env
-```
+### No provider available
+- Set API key: `export GROQ_API_KEY=your_key`
+- Or edit `config/providers.yaml` to enable provider
 
-### No Documents Found
-```bash
-# Make sure PDFs are in data/pdfs/
-ls data/pdfs/
-```
+### Low accuracy
+- Increase `top_k` in `config/strategies.yaml`
+- Adjust temperature for more/less creative responses
+- Check document quality in `data/pdfs/`
 
-## 📄 License
+### Configuration not loading
+- Check `config/strategies.yaml` syntax (valid YAML)
+- System will fallback to hardcoded defaults if YAML fails
+- Check logs for "Loaded strategy configuration" message
 
-GNU General Public License v3.0
+## 📝 License
+
+See [LICENSE](LICENSE) file.
 
 ## 🤝 Contributing
 
-This is a clean, modular RAG implementation. Feel free to extend and modify for your needs!
+1. Fork the repository
+2. Create feature branch
+3. Make changes
+4. Test with `python test_adaptive.py`
+5. Submit pull request
+
+---
+
+**Built with ❤️ using adaptive RAG architecture and industry-standard YAML configuration**
