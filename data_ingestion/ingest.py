@@ -36,8 +36,8 @@ def ingest_documents(
     """
     settings = get_settings()
     data_dir = data_dir or settings.data.data_dir
-    chunk_size = chunk_size or settings.chunking.chunk_size
-    chunk_overlap = chunk_overlap or settings.chunking.chunk_overlap
+    chunk_size = chunk_size or 1000
+    chunk_overlap = chunk_overlap or 200
     
     logger.info("=" * 60)
     logger.info("Starting Data Ingestion")

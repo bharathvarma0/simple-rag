@@ -60,8 +60,8 @@ class VectorDatabase:
             chunk_overlap: Overlap between chunks (uses config default if None)
         """
         settings = get_settings()
-        chunk_size = chunk_size or settings.chunking.chunk_size
-        chunk_overlap = chunk_overlap or settings.chunking.chunk_overlap
+        chunk_size = chunk_size or 1000
+        chunk_overlap = chunk_overlap or 200
         
         logger.info(f"Building vector database from {len(documents)} documents...")
         

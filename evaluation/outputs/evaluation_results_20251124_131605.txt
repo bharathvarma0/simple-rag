@@ -1,0 +1,506 @@
+================================================================================
+ADAPTIVE RAG EVALUATION RESULTS
+Date: 2025-11-24 13:16:10
+================================================================================
+
+Q1: What is the maximum fuel flow rate allowed in the 2026 regulations?
+Category: Fact Retrieval
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+The maximum fuel flow rate allowed is not explicitly stated as a specific number. However, it is mentioned that when the fuel flow rate is above 90% of the maximum fuel flow defined in C5.42.3, fuel pressures must remain constant in each sub-circuit.
+
+I cannot find this information in the provided context
+
+--------------------------------------------------------------------------------
+
+Q2: What is the minimum weight of the car for the 2026 season?
+Category: Fact Retrieval
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+The minimum weight of a car for the 2026 season is 733 kg (Article C4.1).
+
+--------------------------------------------------------------------------------
+
+Q3: Who is the current FIA President mentioned in the documents?
+Category: Fact Retrieval
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+I cannot find this information in the provided context
+
+--------------------------------------------------------------------------------
+
+Q4: What are the dimensions of the front wing?
+Category: Fact Retrieval
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+The dimensions of the front wing are not specified in the provided context.
+
+(I cannot find this information in the provided context)
+
+--------------------------------------------------------------------------------
+
+Q5: What is the penalty for exceeding the budget cap by less than 5%?
+Category: Fact Retrieval
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+I cannot find this information in the provided context.
+
+--------------------------------------------------------------------------------
+
+Q6: Summarize the key changes in the power unit regulations for 2026.
+Category: Summarization
+Classification: ✓ (Expected: summary, Got: summary)
+Strategy: SummaryStrategy
+
+Answer:
+**2026 Power Unit Regulations Summary**
+
+**I. Changes to Power Unit Homologation Dossiers**
+
+* Updated homologation dossiers must be submitted annually (Article 1.5)
+* New ADUO (Alternative Design Unfamiliar) upgrades are allowed every two years
+* Power Units updated to the latest ADUO homologation upgrade can be introduced in competition, subject to FIA approval
+
+**II. Minimal Incidental Changes**
+
+* Limited changes can be made for car installation purposes:
+	+ Components: RV-BODY-REAR, RV-RBWEC, bypass valves, flow restrictors
+	+ Frequency: annual review and approval by the FIA (Article 3.5)
+
+**III. Cost Cap Administration**
+
+* Responsible for administering Power Unit Financial Regulations
+* Monitor compliance, investigate non-compliance, and take enforcement action (E6.1)
+* Maintain confidentiality of Confidential Information
+
+**IV. Definitions**
+
+* "Power Unit" has the meaning set out in the Technical Regulations
+* "2022 PU" refers to Power Units designed to comply with 2022-2025 Technical Regulations
+* "2026 PU" refers to Power Units under development, intended to comply with 2026-2030 Technical Regulations
+
+**V. Cost Cap Administration Functions**
+
+* Review and approval of Power Unit Manufacturer Registration Forms (E6.3)
+* Investigation of suspected non-compliance with Power Unit Financial Regulations
+* Enforcement action for breaches of regulations
+
+**VI. Categories of Breach**
+
+* Procedural breach: failure to comply with FIA requirements
+* Late or incomplete submission of Full Year Reporting Documentation: penalty may be imposed (Article E8.1)
+
+Note: Sources:
+
+* 2026 Formula 1 Regulations (Fédération Internationale de l'Automobile)
+* Power Unit Financial Regulations (Appendices and Articles within the Regulations)
+
+--------------------------------------------------------------------------------
+
+Q7: Give a brief overview of the financial regulations regarding capital expenditure.
+Category: Summarization
+Classification: ✓ (Expected: summary, Got: summary)
+Strategy: SummaryStrategy
+
+Answer:
+**Capital Expenditure Financial Regulations**
+
+The financial regulations regarding capital expenditure are primarily covered in Section D: Financial Regulations (F1 Teams). Key points and main topics include:
+
+### Capital Expenditure Requirements
+
+* F1 Teams must ensure that all capital expenditures comply with the Power Unit Financial Regulations.
+* The Cost Cap Administration may monitor F1 Teams' compliance with these financial regulations on an ongoing basis.
+
+### Controls on Capital Expenditure
+
+* F1 Teams must establish controls to ensure compliance with the Power Unit Financial Regulations, including:
+	+ Reviewing and reporting costs of capital expenditures
+	+ Ensuring that all capital expenditures are properly authorized and accounted for
+	+ Implementing procedures to prevent unauthorized capital expenditures
+
+### Restrictions on Certain Types of Transactions
+
+* The following types of transactions are subject to restrictions or requirements under the Power Unit Financial Regulations:
+	+ Exchange Transactions
+	+ Inter-Team Transactions
+	+ Power Unit Transactions
+	+ Related Party Transactions
+
+### Requirements for Reporting Capital Expenditures
+
+* F1 Teams must provide regular reports on capital expenditures, including:
+	+ Total costs of the Reporting Group
+	+ Details of all major aerodynamic and bodywork components and assemblies that have not been run at a previous Competition or TCC and are intended to be run at the Competition (requirements and format as defined by the Media Delegate, in conjunction with the Commercial Rights Holder)
+
+### Oversight and Enforcement
+
+* The Cost Cap Administration has final authority in determining the proper interpretation and application of these financial regulations.
+* The ICA also has final authority in determining the proper interpretation and application of these financial regulations.
+
+**Key Requirements**
+
+* F1 Teams must ensure that all capital expenditures comply with the Power Unit Financial Regulations.
+* F1 Teams must establish controls to ensure compliance with the Power Unit Financial Regulations.
+* F1 Teams must provide regular reports on capital expenditures.
+
+**Sources:**
+
+* Section D: Financial Regulations (F1 Teams)
+* Power Unit Financial Regulations
+* Cost Cap Administration
+* ICA
+
+--------------------------------------------------------------------------------
+
+Q8: What are the main safety improvements introduced in the latest technical directive?
+Category: Summarization
+Classification: ✗ (Expected: summary, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+I cannot find any information about main safety improvements introduced in a latest technical directive in the provided context.
+
+--------------------------------------------------------------------------------
+
+Q9: Explain the sustainability goals outlined in the strategic plan.
+Category: Summarization
+Classification: ✓ (Expected: summary, Got: summary)
+Strategy: SummaryStrategy
+
+Answer:
+**Sustainability Goals**
+
+The provided context outlines several sustainability goals and objectives for Power Unit Manufacturers in Formula 1. These goals are part of a strategic plan aimed at reducing the environmental impact of the sport.
+
+**Key Points:**
+
+* **Greenhouse Gas (GHG) Emissions**: The goal is to achieve GHG emissions savings, relative to fossil-derived gasoline, of at least that defined for the transport sector in the EU Renewable Energy Directive RED(1).
+* **Advanced Sustainable Components**: The use of advanced sustainable components and fuels must be segregated from non-sustainable components and fuels at all times.
+* **Carbon Footprint Monitoring**: Power Unit Manufacturers are required to monitor their carbon footprint and emissions targets using IT software and licenses.
+
+**Detailed Requirements:**
+
+* The final, blended fuel must achieve a GHG emissions savings of at least 50% compared to the current EU Renewable Energy Directive RED(1) value.
+* Co-processing of certified compounds or refinery streams is not permitted.
+* The Power Unit Manufacturer's premises must host up to a maximum of 50 fully electric, hydrogen-powered, or hybrid-powered road vehicles and their associated refuelling infrastructures.
+
+**Implementation:**
+
+The sustainability goals will be implemented through the development of advanced sustainable components and fuels, as well as the use of IT software and licenses to monitor carbon footprint and emissions targets.
+
+--------------------------------------------------------------------------------
+
+Q10: Summarize the sporting regulations concerning sprint race weekends.
+Category: Summarization
+Classification: ✓ (Expected: summary, Got: summary)
+Strategy: SummaryStrategy
+
+Answer:
+**Sprint Race Weekend Sporting Regulations**
+
+**General Requirements**
+
+* All Competitors must be covered by third-party insurance in accordance with FIA requirements and national laws.
+* The Promoter must send FIA with details of risks covered by insurance policy, sight of which must be available to Competitors on demand (Article B1.4).
+
+**Sprint Session**
+
+* The Sprint grid will be formed based on the results of Sprint Qualifying, classification process, and other relevant factors.
+* Drivers may attempt to make changes to their car during the Sprint without permission from the Technical Delegate if it is reasonable to believe permission would be given (Article B3.5.4).
+* The maximum total Sprint duration is 1.5 hours, which will start at the scheduled Sprint start time and be illuminated by green lights on the start gantry when the safety car leaves the grid (Article B2.3.4).
+
+**On-Track Incidents and Infringements**
+
+* Drivers must follow the instructions of the Race Director, Chief Medical Officer (CMO), or Medical Delegate during a Sprint suspension or Race suspension.
+* Abandoned cars on the circuit may be allowed to participate when the session resumes under exceptional circumstances.
+
+**Classifications and Results**
+
+* Classifications and results for all track running sessions will be published using the Document Management System, including free practice, sprint qualifying session, sprint session, and qualifying session.
+* Decisions or communications concerning a particular Competitor should be given within 25 minutes of such decision, and receipt must be acknowledged (Article B1.1.6).
+
+**Other Requirements**
+
+* Drivers may only attempt to alter the grip of any part of the track surface except by driving on the track (Article B1.1.7).
+* Cars abandoned during a Sprint suspension or Race suspension are considered withdrawn from the session unless they were not abandoned due to mechanical issues, car damage, or gaining an advantage.
+
+Sources:
+* Article B2.3.4: FIA Formula 1 Regulations
+* Article B3.5.4: FIA Formula 1 Regulations
+* Article B2.3.4: FIA Formula 1 Regulations
+* Article B1.1.6: FIA Formula 1 Regulations
+* Article B9.5.5: FIA Formula 1 Regulations
+
+--------------------------------------------------------------------------------
+
+Q11: How does the reduction in MGU-K energy recovery affect the overall power unit efficiency compared to the previous generation?
+Category: Complex Reasoning
+Classification: ✗ (Expected: reasoning, Got: comparison)
+Strategy: ComparisonStrategy
+
+Answer:
+To answer the question about how the reduction in MGU-K energy recovery affects the overall power unit efficiency compared to the previous generation, I'll follow the instructions step by step.
+
+**1. Identify the items being compared**
+
+* The new Power Unit (P.U.) with reduced MGU-K energy recovery
+* The previous generation of P.U.s
+
+**2. Extract relevant information for EACH item from the context**
+
+New Power Unit:
+
+* Reduced MGU-K energy recovery limit: 5MJ per lap (Article C5.2.10)
+* Energy harvested by ERS-K limited to 8.5MJ in each lap (Article C5.2.10, point i)
+
+Previous Generation P.U.s:
+
+* No specific information on energy recovery limits is provided
+
+**3. Present the comparison in a clear, structured format**
+
+| **Item** | **New Power Unit (2026)** | **Previous Generation (No specific data)** |
+| --- | --- | --- |
+| Energy Recovery Limit per Lap | 5MJ (C5.2.10, point i) | Not specified |
+| Maximum Harvestable Energy per Lap | 8.5MJ (C5.2.10, point ii) | Not specified |
+| Power Unit Efficiency Comparison | N/A | Not possible to compare without data |
+
+**4. Highlight similarities and differences**
+
+* Similarity: Both the new P.U. and previous generation have energy recovery limits in place to prevent excessive energy harvesting.
+* Difference: The new P.U.'s reduced MGU-K energy recovery limit and maximum harvestable energy per lap are not directly comparable to the previous generation, as no specific data is provided for the latter.
+
+**5. Cite specific sections**
+
+See references at the end of this response.
+
+**6. If information is missing for any item, explicitly state what's missing**
+
+Data on the previous generation P.U.s' energy recovery limits and power unit efficiency are not available in the provided context.
+
+**7. Do NOT make assumptions or use external knowledge**
+
+The comparison cannot be made without more information on the previous generation P.U.s' specifications.
+
+--------------------------------------------------------------------------------
+
+Q12: Considering the new aerodynamic rules and tire dimensions, what is the expected impact on lap times?
+Category: Complex Reasoning
+Classification: ✗ (Expected: reasoning, Got: reason)
+Strategy: SimpleFactStrategy
+
+Answer:
+I cannot find any information on the expected impact of new aerodynamic rules and tire dimensions on lap times in the provided context.
+
+--------------------------------------------------------------------------------
+
+Q13: If a team exceeds the budget cap due to a force majeure event, what is the likely outcome based on the regulations?
+Category: Complex Reasoning
+Classification: ✗ (Expected: reasoning, Got: fact)
+Strategy: ComplexFactStrategy
+
+Answer:
+Based on the provided context, if a team exceeds the budget cap due to a force majeure event, the likely outcome can be synthesized from the following relevant information:
+
+* A force majeure event is defined as any circumstance beyond the reasonable control of an F1 Team affecting its compliance with these Financial Regulations (Section D: Financial Regulations (F1 Teams), F4.2.5).
+* The FIA will consider, at its absolute discretion, permitting additional occupancy to be used to compensate for that which is lost as a result of a force majeure event (Section D: Financial Regulations (F1 Teams), F4.2.5).
+* However, this does not necessarily mean the team will not incur costs above the cap or that they are exempt from penalties.
+* The regulations state that in the event of an overspend due to "Force Majeure Events", the Cost Cap Administration may at any time during proceedings propose sanctions for such breach (Section D: Financial Regulations (F1 Teams), D8.10.1).
+* Additionally, if a team charged with a Minor Overspend Breach or a Material Overspend Breach is found to have complied with the Cost Cap due to a force majeure event, an express statement to that effect should be included in their sanction report (Section D: Financial Regulations (F1 Teams), D8.11.4).
+
+Given this context, it appears that exceeding the budget cap due to a force majeure event may result in some form of leniency or compensation, but it does not provide blanket immunity from penalties. The likely outcome would depend on how the Cost Cap Administration and FIA choose to apply these regulations in each specific case.
+
+Missing information: None
+
+--------------------------------------------------------------------------------
+
+Q14: Compare the financial restrictions on power unit manufacturers vs. chassis constructors.
+Category: Complex Reasoning
+Classification: ✗ (Expected: reasoning, Got: comparison)
+Strategy: ComparisonStrategy
+
+Answer:
+Here's a comparison of the financial restrictions on power unit manufacturers vs. chassis constructors based on the provided text:
+
+**Items being compared:** Financial restrictions and regulations for Power Unit Manufacturers (PUMs) and Chassis Constructors.
+
+**Similarities:**
+
+* Both PUMs and Chassis Constructors are subject to FIA Formula One Financial Regulations.
+* The FIA has a Cost Cap Administration that reviews and enforces compliance with these regulations. (E6.3.1)
+* Both categories have rules related to shutdown periods, wind tunnel testing, and dyno hour limits. (F3.1-F5.2)
+
+**Differences:**
+
+* **Dyno Hour Limits:** PUMs have a limited number of dyno hours per season, while Chassis Constructors do not have explicit dyno hour limits. (F5.2)
+* **Testing Opportunities:** Works F1 Teams and Customer F1 Teams have equal or similar testing opportunities for chassis components, but PUMs with more Customer F1 Teams supply PUs may face advantages in dyno hours compared to those with fewer teams. (E15 i-b)
+* **Regulatory Function:** The Cost Cap Administration has a regulatory function that includes reviewing Reporting Documentation and enforcing compliance with Power Unit Financial Regulations. Chassis Constructors are not mentioned as having a separate regulatory body or process. (E6.4)
+
+**Missing Information:**
+
+* None of the specified sections provide information on how Chassis Constructors are subject to financial restrictions or regulations.
+* The text does not explicitly state what types of financial restrictions or regulations apply to Chassis Constructors.
+
+Please note that this comparison is limited by the available information in the provided text, and there may be other aspects of the regulations for PUMs and Chassis Constructors that are not addressed here.
+
+--------------------------------------------------------------------------------
+
+Q15: How do the active aerodynamics rules interact with the DRS usage protocols?
+Category: Complex Reasoning
+Classification: ✗ (Expected: reasoning, Got: comparison)
+Strategy: ComparisonStrategy
+
+Answer:
+I can help you compare the active aerodynamics rules with the DRS usage protocols.
+
+**Items being compared:**
+
+* Active Aerodynamics Rules (F4.1.8 and F4.5.2)
+* DRS Usage Protocols (not explicitly stated, but implied in C17.4.3)
+
+**Relevant information for EACH item from the context:**
+
+* **Active Aerodynamics Rules:**
+	+ Can be used when using an FIA-approved geometry
+	+ Allow for additional incidence changes to bodywork ("active aerodynamics")
+	+ Must be clearly identified within FIA-approved CAD files and associated documentation (F4.5.2)
+* **DRS Usage Protocols:**
+	+ Not explicitly stated in the provided text, but implied in C17.4.3
+	+ No specific information is given about DRS usage protocols
+
+**Comparison:**
+
+| **Category** | **Active Aerodynamics Rules** | **Missing/Different Information for DRS Usage Protocols** |
+| --- | --- | --- |
+| Rule Purpose | Allows for additional incidence changes to bodywork ("active aerodynamics") | Not applicable, as DRS usage protocols are not explicitly stated |
+| Documentation | Must be clearly identified within FIA-approved CAD files and associated documentation (F4.5.2) | No specific information is given about documentation requirements |
+| Applicability | Applied when using an FIA-approved geometry (not explicitly stated for DRS usage protocols) | Not applicable, as no information is given about the applicability of DRS usage protocols |
+| **Similarities/Differences:** | N/A (as there is no information to compare) | No specific similarities or differences can be determined, as the information is missing. |
+
+**Missing Information:**
+
+* The exact rules for DRS usage protocols are not provided in the text.
+* There is no clear connection between active aerodynamics rules and DRS usage protocols.
+
+Note that this comparison only includes information explicitly stated in the provided text and does not include external knowledge or assumptions.
+
+--------------------------------------------------------------------------------
+
+Q16: What are the 'Restricted Wind Tunnel Testing' hours?
+Category: Context Understanding
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+I cannot find the specific hours for 'Restricted Wind Tunnel Testing' in the provided context. The context only provides a general definition of Restricted Wind Tunnel Testing, but does not specify the exact times or hours when it is restricted (e.g., Article number, section).
+
+--------------------------------------------------------------------------------
+
+Q17: Define 'Curfew' in the context of race weekends.
+Category: Context Understanding
+Classification: ✗ (Expected: fact, Got: summary)
+Strategy: SummaryStrategy
+
+Answer:
+**Curfew Definition**
+
+In the context of Formula 1 race weekends, a **Curfew** refers to the mandatory quiet period that begins at 12:00 AM (midnight) on the Sunday evening after the Grand Prix. This is in place to ensure public safety and minimize disruptions during the post-race festivities.
+
+**Key Points**
+
+* The Curfew commences at 12:00 AM on the Sunday evening, immediately following the conclusion of the Grand Prix.
+* All personnel must cease all activities within the designated Curfew period.
+* Exceptions are only made for authorized personnel, such as medical staff and security personnel, who require permission from the FIA to remain on site.
+
+**Regulatory Requirements**
+
+* Article F3.1.2 states that during the shutdown periods, no F1 Team or affiliate may carry out or instruct a third-party supplier to carry out any activities related to Car development or testing.
+* The Curfew is an integral part of the Restricted Period Three (RP3) schedule, which allows for limited socializing and exercise on the circuit.
+
+**Exceptions**
+
+* Authorized personnel, such as medical staff and security personnel, may remain on site during the Curfew period with prior permission from the FIA.
+* Exceptions to the Curfew are only permitted in specific circumstances, and all necessary approvals must be obtained from the relevant authorities.
+
+Sources:
+
+* Article F3.1.2: Operational Regulations
+* Article B9.5.3: Restricted Periods
+
+Note: The information provided is based on the context sections provided and may not be exhaustive or up-to-date.
+
+--------------------------------------------------------------------------------
+
+Q18: What does the document say about 'Parc Fermé' conditions?
+Category: Context Understanding
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+The document states that the parc fermé must be positioned as close as possible to the podium, preferably immediately below, with direct access (7. PARC FERMÉ).
+
+--------------------------------------------------------------------------------
+
+Q19: Explain the 'Cost Cap' exclusions listed in Section 3.
+Category: Context Understanding
+Classification: ✗ (Expected: fact, Got: explanation)
+Strategy: SimpleFactStrategy
+
+Answer:
+The 'Cost Cap' exclusions listed in Section 3 are:
+
+a. all costs Directly Attributable to Marketing Activities;
+b. all costs of Consideration provided to an F1 Driver, or to a Connected Party of that F1 Driver, 
+in exchange for that F1 Driver providing the services of an F1 Driver to or for the benefit of the F1 Team, together with all travel and accommodation costs in respect of each F1 Driver;
+c. all costs of Consideration provided to an Other Racing Driver, or to a Connected Party of that Other Racing Driver, 
+in exchange for that Other Racing Driver providing the services of an Other (not explicitly stated, but implied as similar to b).
+
+These exclusions are listed in Article D5: Exclusions.
+
+Reference: D5.1.1
+
+--------------------------------------------------------------------------------
+
+Q20: What are the requirements for a 'Super Licence'?
+Category: Context Understanding
+Classification: ✓ (Expected: fact, Got: fact)
+Strategy: SimpleFactStrategy
+
+Answer:
+According to the context:
+
+To hold a Super Licence, a competitor must be "in possession of a Super Licence or Free Practice Super Licence." (No specific article reference is given in this statement, but it is mentioned in section f)
+
+--------------------------------------------------------------------------------
+
+
+================================================================================
+SUMMARY
+================================================================================
+
+Overall Accuracy: 12/20 (60.0%)
+
+By Category:
+  Complex Reasoning: 0/5 (0%)
+  Context Understanding: 3/5 (60%)
+  Fact Retrieval: 5/5 (100%)
+  Summarization: 4/5 (80%)
+
+Strategy Usage:
+  SimpleFactStrategy: 11 (55%)
+  SummaryStrategy: 5 (25%)
+  ComparisonStrategy: 3 (15%)
+  ComplexFactStrategy: 1 (5%)
+
+================================================================================
