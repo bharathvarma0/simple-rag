@@ -10,6 +10,10 @@ from typing import Optional
 class SummaryStrategy(BaseStrategy):
     """Strategy for summarization questions"""
     
+    def __init__(self):
+        super().__init__()
+        self.strategy_name = 'summary'
+    
     def get_params(self, query_profile: QueryProfile, 
                    doc_profile: Optional[DocumentProfile] = None) -> StrategyParams:
         """Get parameters for summarization"""
@@ -24,7 +28,7 @@ class SummaryStrategy(BaseStrategy):
                 chunk_overlap=config.get('chunk_overlap', 400),
                 top_k=config.get('top_k', 30),
                 retrieval_depth=config.get('retrieval_depth', 1),
-                use_reranking=config.get('use_reranking', False),
+                use_reranking=config.get('use_reranking', True),
                 use_query_expansion=config.get('use_query_expansion', False),
                 temperature=config.get('temperature', 0.2),
                 max_tokens=config.get('max_tokens', 2048)
@@ -36,7 +40,7 @@ class SummaryStrategy(BaseStrategy):
             chunk_overlap=400,
             top_k=30,
             retrieval_depth=1,
-            use_reranking=False,
+            use_reranking=True,
             use_query_expansion=False,
             temperature=0.2,
             max_tokens=2048

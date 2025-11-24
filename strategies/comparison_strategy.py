@@ -10,6 +10,10 @@ from typing import Optional
 class ComparisonStrategy(BaseStrategy):
     """Strategy for comparison questions"""
     
+    def __init__(self):
+        super().__init__()
+        self.strategy_name = 'comparison'
+    
     def get_params(self, query_profile: QueryProfile, 
                    doc_profile: Optional[DocumentProfile] = None) -> StrategyParams:
         """Get parameters for comparison"""

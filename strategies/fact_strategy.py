@@ -10,6 +10,10 @@ from typing import Optional
 class SimpleFactStrategy(BaseStrategy):
     """Strategy for simple fact retrieval questions"""
     
+    def __init__(self):
+        super().__init__()
+        self.strategy_name = 'simple_fact'
+    
     def get_params(self, query_profile: QueryProfile, 
                    doc_profile: Optional[DocumentProfile] = None) -> StrategyParams:
         """Get parameters for simple fact retrieval"""
@@ -65,6 +69,10 @@ Answer:"""
 
 class ComplexFactStrategy(BaseStrategy):
     """Strategy for complex fact retrieval requiring multiple sources"""
+    
+    def __init__(self):
+        super().__init__()
+        self.strategy_name = 'complex_fact'
     
     def get_params(self, query_profile: QueryProfile, 
                    doc_profile: Optional[DocumentProfile] = None) -> StrategyParams:

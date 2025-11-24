@@ -14,6 +14,7 @@ from core.base import BaseStrategy as CoreBaseStrategy, QueryProfile, DocumentPr
 from augmentation.vector_db import VectorDatabase
 from augmentation.search import SimilaritySearch
 from providers.base_provider import BaseLLMProvider
+from components.reranker import create_reranker
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -24,12 +25,14 @@ class BaseStrategy(CoreBaseStrategy):
     
     # Class variable to cache loaded config
     _config_cache = None
+    _reranker_cache = None
     
     def __init__(self):
         self.vector_db = None
         self.search = None
         self.llm = None
         self.strategy_name = None  # Set by subclasses
+        self.reranker = None
     
     @classmethod
     def _load_strategy_config(cls) -> Dict:
@@ -63,6 +66,15 @@ class BaseStrategy(CoreBaseStrategy):
         self.vector_db = vector_db
         self.search = SimilaritySearch(vector_db)
         self.llm = llm
+        
+        # Initialize reranker (lazy, only if enabled)
+        if self.__class__._reranker_cache is None:
+            config = self._load_strategy_config()
+            reranking_config = config.get('reranking', {})
+            self.__class__._reranker_cache = create_reranker(reranking_config)
+            logger.info(f"Initialized reranker: {type(self.__class__._reranker_cache).__name__}")
+        
+        self.reranker = self.__class__._reranker_cache
     
     def execute(self, query: str, query_profile: QueryProfile, 
                 doc_profile: Optional[DocumentProfile] = None) -> Dict[str, Any]:
@@ -71,10 +83,18 @@ class BaseStrategy(CoreBaseStrategy):
         # Get optimal parameters
         params = self.get_params(query_profile, doc_profile)
         
-        logger.info(f"Executing {self.__class__.__name__} with top_k={params.top_k}")
+        # Get strategy-specific config for reranking
+        config_params = self._get_config_params(self.strategy_name) or {}
+        use_reranking = config_params.get('use_reranking', False)
+        rerank_candidates = config_params.get('rerank_candidates', params.top_k * 5)
+        
+        # Determine initial retrieval count
+        initial_top_k = rerank_candidates if use_reranking else params.top_k
+        
+        logger.info(f"Executing {self.__class__.__name__} with top_k={params.top_k}, reranking={use_reranking}")
         
         # Retrieve relevant documents
-        results = self.search.search(query, top_k=params.top_k)
+        results = self.search.search(query, top_k=initial_top_k)
         
         if not results:
             return {
@@ -84,6 +104,11 @@ class BaseStrategy(CoreBaseStrategy):
                 "num_sources": 0,
                 "confidence": 0.0
             }
+        
+        # Apply reranking if enabled
+        if use_reranking and self.reranker:
+            logger.info(f"Re-ranking {len(results)} candidates to top {params.top_k}")
+            results = self.reranker.rerank(query, results, top_k=params.top_k)
         
         # Build context
         context = self._build_context(results)
@@ -107,7 +132,8 @@ class BaseStrategy(CoreBaseStrategy):
             "context": context,
             "num_sources": len(sources),
             "strategy": self.__class__.__name__,
-            "params": params.__dict__
+            "params": params.__dict__,
+            "used_reranking": use_reranking
         }
     
     def _build_context(self, results: list) -> str:

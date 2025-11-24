@@ -1,5 +1,5 @@
 """
-Reasoning strategy
+Reasoning strategy with chain-of-thought prompting
 """
 
 from strategies.base_strategy import BaseStrategy
@@ -9,6 +9,10 @@ from typing import Optional
 
 class ReasoningStrategy(BaseStrategy):
     """Strategy for complex reasoning questions"""
+    
+    def __init__(self):
+        super().__init__()
+        self.strategy_name = 'reasoning'
     
     def get_params(self, query_profile: QueryProfile, 
                    doc_profile: Optional[DocumentProfile] = None) -> StrategyParams:
@@ -44,22 +48,32 @@ class ReasoningStrategy(BaseStrategy):
     
     def _generate_prompt(self, context: str, query: str, 
                         query_profile: QueryProfile) -> str:
-        """Generate prompt for reasoning"""
-        return f"""You are analyzing complex regulatory information. Think step-by-step and reason carefully.
+        """Generate chain-of-thought reasoning prompt"""
+        
+        prompt = f"""You are tasked with answering a complex question that requires multi-step reasoning and logical inference.
 
-Context:
+Context Information:
 {context}
 
 Question: {query}
 
-Instructions:
-1. Break down the question into sub-questions if needed
-2. For each sub-question, find relevant information in the context
-3. Reason through the connections between different pieces of information
-4. Think step-by-step and show your reasoning process
-5. Synthesize a comprehensive answer
-6. Cite all sources used in your reasoning
-7. If you need to make inferences, clearly state them as such
-8. Do NOT use external knowledge - only reason from the provided context
+Please analyze this question step-by-step using the following structure:
 
-Step-by-step analysis:"""
+Step 1 - Identify Key Facts:
+First, identify all relevant facts from the context that relate to the question.
+
+Step 2 - Analyze Relationships:
+Next, analyze how these facts connect to each other and to the question.
+
+Step 3 - Apply Logic:
+Apply logical reasoning to draw conclusions from the facts and their relationships.
+
+Step 4 - Synthesize Answer:
+Finally, synthesize your reasoning into a clear, comprehensive answer.
+
+Important: Base your answer ONLY on the provided context. Do not use external knowledge.
+
+Your detailed answer with reasoning:
+"""
+        
+        return prompt
