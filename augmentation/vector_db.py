@@ -84,6 +84,24 @@ class VectorDatabase:
         self.keyword_db = KeywordDatabase(self.persist_dir)
         self.keyword_db.build_from_documents(chunks)
         
+        # Index chunk relationships for multi-stage retrieval
+        try:
+            from augmentation.chunk_context import ChunkContext
+            chunk_context = ChunkContext()
+            
+            # Convert chunks to format expected by chunk_context
+            chunk_data = []
+            for idx, (chunk, meta) in enumerate(zip(chunks, metadatas)):
+                chunk_data.append({
+                    "page_content": chunk.page_content,
+                    "metadata": meta
+                })
+            
+            chunk_context.index_chunks(chunk_data)
+            logger.info("Indexed chunk relationships for multi-stage retrieval")
+        except Exception as e:
+            logger.warning(f"Could not index chunk relationships: {e}")
+        
         # Save
         self.save()
         logger.info("Vector database built and saved")

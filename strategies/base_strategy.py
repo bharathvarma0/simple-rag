@@ -78,23 +78,34 @@ class BaseStrategy(CoreBaseStrategy):
     
     def execute(self, query: str, query_profile: QueryProfile, 
                 doc_profile: Optional[DocumentProfile] = None) -> Dict[str, Any]:
-        """Execute the strategy"""
+        """Execute the strategy with multi-stage retrieval"""
         
         # Get optimal parameters
         params = self.get_params(query_profile, doc_profile)
         
-        # Get strategy-specific config for reranking
+        # Get strategy-specific config
         config_params = self._get_config_params(self.strategy_name) or {}
+        
+        # Multi-stage retrieval params
+        retrieval_depth = config_params.get('retrieval_depth', 1)
+        initial_candidates = config_params.get('initial_candidates', params.top_k)
+        
+        # Re-ranking params
         use_reranking = config_params.get('use_reranking', False)
-        rerank_candidates = config_params.get('rerank_candidates', params.top_k * 5)
+        rerank_candidates = config_params.get('rerank_candidates', initial_candidates)
         
-        # Determine initial retrieval count
-        initial_top_k = rerank_candidates if use_reranking else params.top_k
+        logger.info(
+            f"Executing {self.__class__.__name__} with top_k={params.top_k}, "
+            f"depth={retrieval_depth}, reranking={use_reranking}"
+        )
         
-        logger.info(f"Executing {self.__class__.__name__} with top_k={params.top_k}, reranking={use_reranking}")
-        
-        # Retrieve relevant documents
-        results = self.search.search(query, top_k=initial_top_k)
+        # Stage 1 & 2: Retrieve with multi-stage (includes context expansion if depth > 1)
+        results = self.search.search(
+            query, 
+            top_k=rerank_candidates if use_reranking else params.top_k,
+            retrieval_depth=retrieval_depth,
+            initial_candidates=initial_candidates
+        )
         
         if not results:
             return {
@@ -105,7 +116,7 @@ class BaseStrategy(CoreBaseStrategy):
                 "confidence": 0.0
             }
         
-        # Apply reranking if enabled
+        # Stage 3: Apply reranking if enabled
         if use_reranking and self.reranker:
             logger.info(f"Re-ranking {len(results)} candidates to top {params.top_k}")
             results = self.reranker.rerank(query, results, top_k=params.top_k)
@@ -133,7 +144,8 @@ class BaseStrategy(CoreBaseStrategy):
             "num_sources": len(sources),
             "strategy": self.__class__.__name__,
             "params": params.__dict__,
-            "used_reranking": use_reranking
+            "used_reranking": use_reranking,
+            "retrieval_depth": retrieval_depth
         }
     
     def _build_context(self, results: list) -> str:
