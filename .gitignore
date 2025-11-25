@@ -1,23 +1,41 @@
-*.pkl
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+
+# Generated Files (regenerated on build)
+vector_store/
+evaluation/outputs/
+*.jsonl
+metrics.jsonl
+
+# Environment Variables (SECRETS!)
+.env
+.env.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Data (optional - uncomment if you don't want to commit data files)
-# data/
-
-# Jupyter Notebooks (keeping them but ignoring output)
-.ipynb_checkpoints/
-*.ipynb_checkpoints/
-
 # Logs
 *.log
+logs/
 
+# Model Cache
+.cache/
+model_cache/
