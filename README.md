@@ -33,9 +33,19 @@ RAG-Tutorials/
 
 ### 1. Installation
 
+#### Local Installation
 ```bash
 # Install dependencies
 pip install -r requirements.txt
+```
+
+#### Docker Installation
+```bash
+# Build the image
+docker build -t rag-tutorial .
+
+# Run the container
+docker run -it --env-file .env -v $(pwd)/data:/app/data -v $(pwd)/vector_store:/app/vector_store rag-tutorial
 ```
 
 ### 2. Set Environment Variables
