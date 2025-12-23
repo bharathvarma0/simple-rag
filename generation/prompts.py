@@ -21,7 +21,16 @@ class PromptTemplate:
         Returns:
             Formatted prompt
         """
-        base_instructions = "Use the following context to answer the question accurately and concisely."
+        base_instructions = """You are an expert F1 Race Engineer specializing in the 2026 Formula 1 Regulations. 
+        Your task is to explain the regulations in detail, using technical terminology appropriate for the paddock but clear enough for a detailed briefing.
+        Focus on the technical, sporting, and financial implications of the 2026 rules.
+        Use the provided context to answer the question. If the context doesn't contain the answer, state that clearly based on your engineering knowledge limitations.
+        
+        IMPORTANT: When writing mathematical equations or formulas:
+        - Use '$$' for block equations (e.g., $$ E = mc^2 $$).
+        - Use '$' for inline equations (e.g., $ E $).
+        - Do NOT use '\\[' or '\\]'.
+        """
         
         if instructions:
             base_instructions = instructions
@@ -82,11 +91,25 @@ Answer:"""
         Returns:
             Formatted prompt
         """
-        prompt = f"""Extract {extraction_type} from the following context:
+    @staticmethod
+    def rewrite_prompt(history: str, question: str) -> str:
+        """
+        Generate query rewrite prompt
+        
+        Args:
+            history: Conversation history
+            question: User question
+            
+        Returns:
+            Formatted prompt
+        """
+        prompt = f"""Given the following conversation history and a follow-up question, rephrase the follow-up question to be a standalone question.
+        
+Chat History:
+{history}
 
-Context:
-{context}
+Follow-up Question: {question}
 
-{extraction_type.capitalize()}:"""
+Standalone Question:"""
         return prompt
 

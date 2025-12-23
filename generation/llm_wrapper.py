@@ -15,7 +15,7 @@ class LLMWrapper:
     
     def __init__(
         self,
-        provider: str = "groq",
+        provider: Optional[str] = None,
         model_name: Optional[str] = None,
         api_key: Optional[str] = None,
         temperature: Optional[float] = None,
@@ -112,4 +112,5 @@ class LLMWrapper:
     def llm(self):
         """Get underlying LLM client"""
         return self._llm
+
 

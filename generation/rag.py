@@ -80,6 +80,10 @@ class RAGPipeline:
         # Initialize prompt template
         self.prompt_template = PromptTemplate()
         
+        # Initialize memory
+        from generation.memory import ConversationMemory
+        self.memory = ConversationMemory()
+        
         logger.info(f"RAG pipeline initialized with LLM: {self.llm.model_name}")
     
     def query(self, question: str, top_k: Optional[int] = None) -> Dict[str, Any]:
@@ -97,8 +101,18 @@ class RAGPipeline:
         
         logger.info(f"Processing question: {question}")
         
-        # Retrieve relevant documents
-        results = self.search.search(question, top_k=top_k)
+        # Rewrite question if history exists
+        search_query = question
+        history = self.memory.get_history_string()
+        
+        if history and self.settings.memory.enabled:
+            logger.info("Rewriting question based on history...")
+            rewrite_prompt = self.prompt_template.rewrite_prompt(history, question)
+            search_query = self.llm.generate(rewrite_prompt).strip()
+            logger.info(f"Rewritten query: '{search_query}'")
+        
+        # Retrieve relevant documents using search_query
+        results = self.search.search(search_query, top_k=top_k)
         
         if not results:
             logger.warning("No relevant documents found")
@@ -110,13 +124,17 @@ class RAGPipeline:
             }
         
         # Build context from retrieved documents
-        context = self.search.get_context(question, top_k=top_k)
+        context = self.search.get_context(search_query, top_k=top_k)
         
         # Generate prompt using template
         prompt = self.prompt_template.rag_prompt(context=context, question=question)
         
         # Generate answer using LLM
         answer = self.llm.generate(prompt)
+        
+        # Update memory
+        if self.settings.memory.enabled:
+            self.memory.add_turn(question, answer)
         
         # Extract source information
         sources = []
@@ -136,7 +154,8 @@ class RAGPipeline:
             "answer": answer,
             "sources": sources,
             "context": context,
-            "num_sources": len(sources)
+            "num_sources": len(sources),
+            "rewritten_query": search_query if search_query != question else None
         }
     
     def ask(self, question: str, top_k: Optional[int] = None) -> str:
