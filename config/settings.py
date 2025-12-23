@@ -37,8 +37,8 @@ class VectorStoreConfig:
 @dataclass
 class LLMConfig:
     """Configuration for LLM"""
-    provider: str = "groq"  # groq, openai, etc.
-    model_name: str = "gemma2-9b-it"
+    provider: str = "openai"  # groq, openai, etc.
+    model_name: str = "gpt-4o-mini"
     temperature: float = 0.1
     max_tokens: int = 1024
     api_key: Optional[str] = None
@@ -108,4 +108,5 @@ def reset_settings():
     """Reset global settings (useful for testing)"""
     global _settings
     _settings = None
+
 

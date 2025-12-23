@@ -10,3 +10,7 @@ pymupdf
 rank_bm25
 python-dotenv
 pytest
+fastapi
+uvicorn
+streamlit
+python-multipart
