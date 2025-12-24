@@ -41,14 +41,14 @@ async def ingest(request: IngestRequest):
         chunk_overlap = request.chunk_overlap or settings.chunking.chunk_overlap
         
         # Ingest documents
-        raw_docs, chunks = ingest_documents(
-            data_dir=data_dir,
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap
-        )
-        
-        if not chunks:
-            raise HTTPException(status_code=400, detail="No documents found or processed")
+        try:
+            raw_docs, chunks = ingest_documents(
+                data_dir=data_dir,
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
             
         # Build vector database
         vector_db = VectorDatabase(
