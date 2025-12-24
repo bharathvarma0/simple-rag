@@ -14,8 +14,8 @@ load_dotenv()
 @dataclass
 class EmbeddingConfig:
     """Configuration for embedding generation"""
-    model_name: str = "all-MiniLM-L6-v2"
-    dimension: int = 384  # Will be set automatically based on model
+    model_name: str = "text-embedding-3-small"
+    dimension: int = 1536  # Will be set automatically based on model
     
     
 @dataclass
@@ -61,6 +61,14 @@ class RetrievalConfig:
 
 
 @dataclass
+class RerankerConfig:
+    """Configuration for reranking"""
+    enabled: bool = True
+    model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    top_n: int = 5  # Final number of chunks to send to LLM
+
+
+@dataclass
 class MemoryConfig:
     """Configuration for conversational memory"""
     history_window_size: int = 5  # Number of turns to keep
@@ -82,6 +90,7 @@ class Settings:
     vector_store: VectorStoreConfig = field(default_factory=VectorStoreConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
     retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
+    reranker: RerankerConfig = field(default_factory=RerankerConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     data: DataConfig = field(default_factory=DataConfig)
     

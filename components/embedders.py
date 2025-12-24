@@ -8,7 +8,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from langchain_openai import OpenAIEmbeddings
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -17,17 +17,17 @@ logger = get_logger(__name__)
 class EmbeddingGenerator:
     """Generate embeddings for text documents"""
     
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "text-embedding-3-small"):
         """
         Initialize embedding generator
         
         Args:
-            model_name: HuggingFace model name for sentence embeddings
+            model_name: OpenAI model name for embeddings
         """
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name)
+        self.model = OpenAIEmbeddings(model=model_name)
         logger.info(f"Loaded embedding model: {model_name}")
-        logger.info(f"Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
+        # logger.info(f"Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
     
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
         """
@@ -40,7 +40,8 @@ class EmbeddingGenerator:
             NumPy array of embeddings with shape (len(texts), embedding_dim)
         """
         logger.info(f"Generating embeddings for {len(texts)} texts...")
-        embeddings = self.model.encode(texts, show_progress_bar=True)
+        embeddings = self.model.embed_documents(texts)
+        embeddings = np.array(embeddings)
         logger.info(f"Generated embeddings with shape: {embeddings.shape}")
         return embeddings
     
@@ -54,6 +55,6 @@ class EmbeddingGenerator:
         Returns:
             NumPy array of embedding with shape (embedding_dim,)
         """
-        embedding = self.model.encode([text])
-        return embedding[0]
+        embedding = self.model.embed_query(text)
+        return np.array(embedding)
 
