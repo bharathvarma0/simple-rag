@@ -18,13 +18,15 @@ RAG-Tutorials/
 │   └── ingest.py          # Main ingestion script
 ├── augmentation/          # Vector database and similarity search
 │   ├── __init__.py
-│   ├── vector_db.py      # FAISS vector database management
+│   ├── vector_db.py      # Qdrant vector database management
 │   └── search.py         # Similarity search utilities
 ├── generation/            # LLM generation
 │   ├── __init__.py
 │   └── rag.py            # RAG pipeline (retrieval + generation)
 ├── vector_store/         # Generated vector store (created automatically)
-├── app.py                # Main application entry point
+├── api/                  # API endpoints
+│   ├── main.py           # FastAPI application entry point
+│   └── routes.py         # API routes
 ├── requirements.txt      # Python dependencies
 └── README.md            # This file
 ```
@@ -53,10 +55,10 @@ docker run -it --env-file .env -v $(pwd)/data:/app/data -v $(pwd)/vector_store:/
 Create a `.env` file in the root directory:
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-Get your API key from: https://console.groq.com/
+Get your API key from: https://platform.openai.com/
 
 ### 3. Add Your Documents
 
@@ -86,21 +88,16 @@ python app.py
 
 ## 📖 Usage
 
-### Command Line Interface
+### API Usage
+
+The system exposes a FastAPI interface.
 
 ```bash
-# Build vector store
-python app.py --build
-
-# Query with specific question
-python app.py --query "Your question here"
-
-# Query with custom top-k
-python app.py --query "Your question" --top-k 3
-
-# Interactive mode
-python app.py
+# Start the API
+uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
+
+Visit `http://localhost:8000/docs` for the interactive API documentation.
 
 ### Python API
 
@@ -147,11 +144,11 @@ vector_db.build_from_documents(raw_docs)
 - Configurable chunk size and overlap
 
 ### Embedding Generators (`components/embedders.py`)
-- Uses SentenceTransformer models
-- Default: `all-MiniLM-L6-v2` (384 dimensions)
+- Uses OpenAI Embeddings
+- Model: `text-embedding-3-small` (1536 dimensions)
 
 ### Vector Database (`augmentation/vector_db.py`)
-- FAISS-based vector storage
+- Qdrant-based vector storage
 - Persistent storage to disk
 - Automatic loading and saving
 
@@ -162,7 +159,7 @@ vector_db.build_from_documents(raw_docs)
 
 ### RAG Pipeline (`generation/rag.py`)
 - Traditional RAG: Retrieve → Generate
-- Uses Groq LLM for generation
+- Uses OpenAI LLM for generation
 - Returns answers with source citations
 
 ## ⚙️ Configuration
@@ -182,7 +179,7 @@ Edit `data_ingestion/ingest.py`:
 ### LLM Settings
 
 Edit `generation/rag.py`:
-- `llm_model`: Groq model name (default: `gemma2-9b-it`)
+- `llm_model`: OpenAI model name (default: `gpt-4o-mini`)
 - `temperature`: LLM temperature (default: 0.1)
 - `max_tokens`: Maximum tokens (default: 1024)
 
@@ -198,9 +195,9 @@ Edit `generation/rag.py`:
 ## 🔧 Dependencies
 
 - `langchain` - Document processing framework
-- `sentence-transformers` - Embedding generation
-- `faiss-cpu` - Vector database
-- `langchain-groq` - Groq LLM integration
+- `langchain-openai` - OpenAI integration
+- `openai` - OpenAI SDK
+- `qdrant-client` - Vector database
 - `pypdf` / `pymupdf` - PDF processing
 
 ## 📋 Workflow
@@ -222,10 +219,10 @@ Edit `generation/rag.py`:
 python app.py --build
 ```
 
-### GROQ_API_KEY Not Found
+### OPENAI_API_KEY Not Found
 ```bash
 # Create .env file with your API key
-echo "GROQ_API_KEY=your_key_here" > .env
+echo "OPENAI_API_KEY=your_key_here" > .env
 ```
 
 ### No Documents Found

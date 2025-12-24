@@ -4,7 +4,6 @@ LLM wrapper for different providers
 
 import os
 from typing import Optional, List, Dict, Any
-from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 
 from config import get_settings
@@ -25,7 +24,7 @@ class LLMWrapper:
         Initialize LLM wrapper
         
         Args:
-            provider: LLM provider ("groq" or "openai")
+            provider: LLM provider ("openai")
             model_name: Model name (uses config default if None)
             api_key: API key (uses env var if None)
             temperature: Temperature (uses config default if None)
@@ -50,14 +49,7 @@ class LLMWrapper:
                 "Set it as environment variable or pass as parameter."
             )
         
-        if self.provider.lower() == "groq":
-            self._llm = ChatGroq(
-                groq_api_key=self.api_key,
-                model_name=self.model_name,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens
-            )
-        elif self.provider.lower() == "openai":
+        if self.provider.lower() == "openai":
             self._llm = ChatOpenAI(
                 openai_api_key=self.api_key,
                 model_name=self.model_name,

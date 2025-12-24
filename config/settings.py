@@ -46,9 +46,7 @@ class LLMConfig:
     def __post_init__(self):
         """Load API key from environment if not provided"""
         if self.api_key is None:
-            if self.provider == "groq":
-                self.api_key = os.getenv("GROQ_API_KEY")
-            elif self.provider == "openai":
+            if self.provider == "openai":
                 self.api_key = os.getenv("OPENAI_API_KEY")
 
 
