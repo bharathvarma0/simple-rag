@@ -7,7 +7,6 @@ class QueryRequest(BaseModel):
 
 class Source(BaseModel):
     rank: int
-    similarity_score: float
     distance: float
     source: str
     preview: str

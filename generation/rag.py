@@ -121,7 +121,8 @@ class RAGPipeline:
                 "answer": "No relevant documents found.",
                 "sources": [],
                 "context": "",
-                "num_sources": 0
+                "num_sources": 0,
+                "rewritten_query": None
             }
         
         # Dynamic Context Selection
@@ -178,9 +179,9 @@ class RAGPipeline:
         for i, result in enumerate(final_results, 1):
             source_info = {
                 "rank": i,
-                "similarity_score": result["similarity_score"],
+                "distance": result["similarity_score"],
                 "source": result["metadata"].get("source", "unknown"),
-                "preview": result["metadata"].get("text", "")[:200] + "..."
+                "preview": result["metadata"].get("text", "")[:300]
             }
             sources.append(source_info)
         
