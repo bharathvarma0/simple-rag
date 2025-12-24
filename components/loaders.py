@@ -119,3 +119,37 @@ class DocumentLoader:
         logger.info(f" Total documents loaded: {len(documents)}")
         return documents
 
+
+def load_pdfs_from_dir(data_dir: str) -> List[Any]:
+    """
+    Load PDFs from a directory
+    
+    Args:
+        data_dir: Directory containing PDFs
+        
+    Returns:
+        List of LangChain Document objects
+    """
+    documents = []
+    pdf_dir = Path(data_dir)
+    
+    if not pdf_dir.exists():
+        logger.warning(f"Directory not found: {data_dir}")
+        return []
+        
+    logger.info(f"Scanning for PDFs in: {pdf_dir.resolve()}")
+    
+    # Glob for PDF files
+    pdf_files = list(pdf_dir.glob("*.pdf"))
+    logger.info(f"Found {len(pdf_files)} PDF files")
+    
+    for pdf_path in pdf_files:
+        try:
+            loader = PyPDFLoader(str(pdf_path))
+            docs = loader.load()
+            logger.info(f"Loaded {len(docs)} pages from {pdf_path.name}")
+            documents.extend(docs)
+        except Exception as e:
+            logger.error(f"Failed to load PDF {pdf_path.name}: {e}")
+            
+    return documents

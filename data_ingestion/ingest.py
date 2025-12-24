@@ -43,13 +43,13 @@ def ingest_documents(
     logger.info("Starting Data Ingestion")
     logger.info("=" * 60)
     
-    # Load documents
-    loader = DocumentLoader(data_dir)
-    raw_documents = loader.load_all()
+    # Load documents using the new explicit loader
+    from components.loaders import load_pdfs_from_dir
+    raw_documents = load_pdfs_from_dir(data_dir)
     
     if not raw_documents:
-        logger.warning("No documents loaded!")
-        return None, None
+        logger.error("No documents found or processed!")
+        raise ValueError("No documents found or processed")
     
     # Chunk documents
     chunker = DocumentChunker(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
