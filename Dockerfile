@@ -24,7 +24,7 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
 # Persist data
-VOLUME ["/app/data", "/app/vector_store"]
+
 
 # Default command to run the API
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
