@@ -20,5 +20,11 @@ RUN mkdir -p data/pdfs vector_store
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Default command
-ENTRYPOINT ["python", "app.py"]
+# Expose API port
+EXPOSE 8000
+
+# Persist data
+VOLUME ["/app/data", "/app/vector_store"]
+
+# Default command to run the API
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

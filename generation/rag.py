@@ -112,7 +112,8 @@ class RAGPipeline:
             logger.info(f"Rewritten query: '{search_query}'")
         
         # Retrieve relevant documents using search_query
-        results = self.search.search(search_query, top_k=top_k)
+        # We request more than needed to allow for dynamic filtering
+        results = self.search.search(search_query, top_k=top_k * 2)
         
         if not results:
             logger.warning("No relevant documents found")
@@ -123,8 +124,42 @@ class RAGPipeline:
                 "num_sources": 0
             }
         
-        # Build context from retrieved documents
-        context = self.search.get_context(search_query, top_k=top_k)
+        # Dynamic Context Selection
+        # Select chunks based on token budget and score threshold
+        final_results = []
+        current_tokens = 0
+        max_context_tokens = 1500 # Token budget for context
+        min_score_threshold = 0.3 # Minimum similarity score
+        
+        # Estimate tokens (approx 4 chars per token)
+        def estimate_tokens(text):
+            return len(text) / 4
+            
+        for res in results:
+            # Check score threshold
+            if res["similarity_score"] < min_score_threshold:
+                continue
+                
+            text = res["metadata"].get("text", "")
+            tokens = estimate_tokens(text)
+            
+            if current_tokens + tokens > max_context_tokens:
+                break
+                
+            final_results.append(res)
+            current_tokens += tokens
+            
+            # Stop if we have enough high-quality chunks (e.g., 5)
+            if len(final_results) >= top_k:
+                break
+        
+        # If no chunks passed the threshold, fallback to top 1 (if available)
+        if not final_results and results:
+            final_results = [results[0]]
+            
+        # Build context from selected documents
+        texts = [r["metadata"].get("text", "") for r in final_results]
+        context = "\n\n".join(texts)
         
         # Generate prompt using template
         prompt = self.prompt_template.rag_prompt(context=context, question=question)
@@ -135,14 +170,15 @@ class RAGPipeline:
         # Update memory
         if self.settings.memory.enabled:
             self.memory.add_turn(question, answer)
+            # Periodically summarize memory (e.g., every turn, let the memory class decide based on size)
+            self.memory.summarize(self.llm)
         
         # Extract source information
         sources = []
-        for i, result in enumerate(results, 1):
+        for i, result in enumerate(final_results, 1):
             source_info = {
                 "rank": i,
                 "similarity_score": result["similarity_score"],
-                "distance": result["distance"],
                 "source": result["metadata"].get("source", "unknown"),
                 "preview": result["metadata"].get("text", "")[:200] + "..."
             }

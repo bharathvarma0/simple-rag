@@ -9,3 +9,7 @@ venv/
 .DS_Store
 vector_store/
 *.log
+tests/
+debug_qdrant.py
+test_output.txt
+.pytest_cache/
