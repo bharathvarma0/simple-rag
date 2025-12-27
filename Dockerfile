@@ -25,5 +25,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY --chown=user . .
 
-# Run uvicorn directly to ensure proper signal handling and port binding
-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT}"]
+# Pre-download models to speed up startup
+RUN python download_models.py
+
+# Run app.py which handles port and host binding
+CMD ["python", "app.py"]
