@@ -28,8 +28,13 @@ app.add_middleware(
 )
 
 # Root health check for Railway
+# Root health check for Railway
 @app.get("/")
-def health():
+def health_root():
+    return {"status": "ok"}
+
+@app.get("/health")
+def health_check():
     return {"status": "ok"}
 
 # Include router
