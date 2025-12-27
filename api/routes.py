@@ -26,6 +26,8 @@ def get_rag_pipeline():
         rag_pipeline = AdaptiveRAGPipeline()
     return rag_pipeline
 
+import uuid
+
 @router.post("/query", response_model=QueryResponse)
 def query(request: QueryRequest):
     """
@@ -33,7 +35,7 @@ def query(request: QueryRequest):
     """
     try:
         rag = get_rag_pipeline()
-        result = rag.query(request.question)
+        result = rag.query(request.question, doc_id=request.doc_id)
         
         # Add complexity from query profile if available
         if 'query_profile' in result:
@@ -43,7 +45,6 @@ def query(request: QueryRequest):
     except Exception as e:
         logger.error(f"Query failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @router.get("/health")
@@ -103,23 +104,25 @@ def upload_document(file: UploadFile = File(...)):
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
+        # Generate a unique Doc ID
+        doc_id = str(uuid.uuid4())
+            
         # Trigger automatic ingestion for this file
         try:
             # 1. Load and chunk just this file
-            # We need to modify ingest_documents to accept a specific file, 
-            # or we can use the lower-level components directly here for speed.
-            # Let's use the components directly to avoid re-scanning the whole dir.
-            
             from components.loaders import PDFLoader
             from components.chunkers import DocumentChunker
-            from augmentation.vector_db import VectorDatabase
-            from augmentation.keyword_db import KeywordDatabase
             
             # Load
             loader = PDFLoader(file_path)
             documents = loader.load()
             
             if documents:
+                # Add metadata (doc_id and filename) to every document/page BEFORE chunking
+                for doc in documents:
+                    doc.metadata["doc_id"] = doc_id
+                    doc.metadata["filename"] = file.filename
+                
                 # Chunk
                 chunker = DocumentChunker(
                     chunk_size=settings.chunking.chunk_size,
@@ -130,28 +133,23 @@ def upload_document(file: UploadFile = File(...)):
                 # Add to Vector DB
                 # Use the global RAG pipeline's vector DB to avoid lock contention
                 rag = get_rag_pipeline()
-                # We need to access the vector_db from the pipeline. 
-                # AdaptiveRAGPipeline -> vector_db attribute
                 if hasattr(rag, 'vector_db'):
                     rag.vector_db.add_chunks(chunks)
                 else:
-                    # Fallback if structure is different (shouldn't happen based on code)
                     logger.error("Could not access vector_db from global pipeline")
                     raise RuntimeError("Global vector DB access failed")
                 
-                # Update Keyword DB (Note: This is still not ideal for concurrency, but works for now)
-                # Ideally we'd append to the index, but BM25 usually needs a full rebuild or complex incremental updates.
-                # For now, we'll skip rebuilding the WHOLE BM25 index on every upload to avoid blocking.
-                # A background task should handle full re-indexing.
-                
-                logger.info(f"Automatically ingested {len(chunks)} chunks for {file.filename}")
+                logger.info(f"Automatically ingested {len(chunks)} chunks for {file.filename} (doc_id={doc_id})")
                 
         except Exception as e:
             logger.error(f"Automatic ingestion failed for {file.filename}: {e}")
-            # We don't fail the upload if ingestion fails, but we warn
             return {"message": f"Uploaded {file.filename}, but ingestion failed: {str(e)}", "filename": file.filename}
             
-        return {"message": f"Successfully uploaded and ingested {file.filename}", "filename": file.filename}
+        return {
+            "message": f"Successfully uploaded and ingested {file.filename}", 
+            "filename": file.filename,
+            "doc_id": doc_id
+        }
     except Exception as e:
         logger.error(f"Failed to upload document: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))

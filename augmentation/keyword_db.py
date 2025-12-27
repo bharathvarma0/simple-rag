@@ -61,13 +61,14 @@ class KeywordDatabase:
         self.save()
         logger.info("Keyword database built and saved")
     
-    def search(self, query: str, top_k: int = 5) -> List[Dict]:
+    def search(self, query: str, top_k: int = 5, filter_doc_id: Optional[str] = None) -> List[Dict]:
         """
         Search for documents using keywords
         
         Args:
             query: Search query
             top_k: Number of results to return
+            filter_doc_id: Optional document ID to filter by
             
         Returns:
             List of results with scores
@@ -81,18 +82,30 @@ class KeywordDatabase:
         # Get scores
         scores = self.bm25.get_scores(tokenized_query)
         
-        # Get top-k indices
-        top_n = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+        # Get indices sorted by score
+        # We sort all indices because we might filter many out
+        top_n_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
         
         results = []
-        for idx in top_n:
-            if scores[idx] > 0:  # Only return relevant results
-                results.append({
-                    "text": self.documents[idx],
-                    "metadata": self.metadata[idx],
-                    "score": scores[idx],
-                    "id": idx
-                })
+        for idx in top_n_indices:
+            if len(results) >= top_k:
+                break
+                
+            if scores[idx] <= 0:  # Only return relevant results
+                continue
+                
+            # Apply filter
+            if filter_doc_id:
+                doc_meta = self.metadata[idx]
+                if doc_meta.get("doc_id") != filter_doc_id:
+                    continue
+            
+            results.append({
+                "text": self.documents[idx],
+                "metadata": self.metadata[idx],
+                "score": scores[idx],
+                "id": idx
+            })
                 
         return results
     

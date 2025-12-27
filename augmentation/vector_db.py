@@ -166,27 +166,26 @@ class VectorDatabase:
         
         logger.info(f"Added {len(points)} vectors to database")
     
-    def search(self, query_embedding: np.ndarray, k: int = 5, filter_ids: Optional[List[int]] = None) -> Tuple[List[float], List[int], List[Dict]]:
+    def search(self, query_embedding: np.ndarray, k: int = 5, filter_doc_id: Optional[str] = None) -> Tuple[List[float], List[int], List[Dict]]:
         """
         Search for similar vectors
         
         Args:
             query_embedding: Query vector
             k: Number of results
-            filter_ids: Optional list of chunk IDs to filter by (for optimization)
+            filter_doc_id: Optional document ID to filter by
             
         Returns:
             Tuple of (distances, indices, metadatas)
             Note: indices here will be the chunk_ids from payload, not Qdrant UUIDs
         """
         search_filter = None
-        if filter_ids is not None:
-            # Create a filter for chunk_ids
+        if filter_doc_id:
             search_filter = models.Filter(
                 must=[
                     models.FieldCondition(
-                        key="chunk_id",
-                        match=models.MatchAny(any=filter_ids)
+                        key="doc_id",
+                        match=models.MatchValue(value=filter_doc_id)
                     )
                 ]
             )

@@ -77,7 +77,8 @@ class BaseStrategy(CoreBaseStrategy):
         self.reranker = self.__class__._reranker_cache
     
     def execute(self, query: str, query_profile: QueryProfile, 
-                doc_profile: Optional[DocumentProfile] = None) -> Dict[str, Any]:
+                doc_profile: Optional[DocumentProfile] = None,
+                doc_id: Optional[str] = None) -> Dict[str, Any]:
         """Execute the strategy with multi-stage retrieval"""
         
         # Get optimal parameters
@@ -96,14 +97,15 @@ class BaseStrategy(CoreBaseStrategy):
         
         logger.info(
             f"Executing {self.__class__.__name__} with top_k={params.top_k}, "
-            f"depth={retrieval_depth}, reranking={use_reranking}"
+            f"depth={retrieval_depth}, reranking={use_reranking}, doc_id={doc_id}"
         )
         
         # Stage 1: Retrieve using Hybrid Search (BM25 + Vector + RRF + Reranking)
         # We delegate all retrieval complexity to SimilaritySearch
         results = self.search.search(
             query, 
-            top_k=params.top_k
+            top_k=params.top_k,
+            filter_doc_id=doc_id
         )
         
         if not results:

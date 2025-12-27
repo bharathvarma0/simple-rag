@@ -158,12 +158,13 @@ class AdaptiveRAGPipeline:
             self.strategy_selector.register_strategy(name, strategy_class)
     
     @cache_result(prefix="rag_query", ttl=3600)
-    def query(self, question: str) -> Dict[str, Any]:
+    def query(self, question: str, doc_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Query the adaptive RAG system
         
         Args:
             question: User question
+            doc_id: Optional document ID to filter by
             
         Returns:
             Dictionary with answer, sources, and metadata
@@ -172,7 +173,7 @@ class AdaptiveRAGPipeline:
         start_time = time.time()
         
         logger.info("=" * 60)
-        logger.info(f"Processing query: {question}")
+        logger.info(f"Processing query: {question} (doc_id={doc_id})")
         logger.info("=" * 60)
         
         # Step 1: Analyze query
@@ -185,7 +186,7 @@ class AdaptiveRAGPipeline:
         strategy.initialize(self.vector_db, self.llm)
         
         # Step 4: Execute strategy
-        result = strategy.execute(question, query_profile)
+        result = strategy.execute(question, query_profile, doc_id=doc_id)
         
         # Calculate response time
         response_time = time.time() - start_time

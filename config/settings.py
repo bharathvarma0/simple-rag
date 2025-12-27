@@ -29,7 +29,8 @@ class ChunkingConfig:
 @dataclass
 class VectorStoreConfig:
     """Configuration for vector store"""
-    persist_dir: str = "vector_store"
+    # Use /data/vector_store if /data exists (Hugging Face persistent storage), else local vector_store
+    persist_dir: str = "/data/vector_store" if Path("/data").exists() else "vector_store"
     index_type: str = "hnsw"  # Options: "flat", "hnsw"
     hnsw_m: int = 32  # Number of connections per node for HNSW
     url: Optional[str] = None  # URL for Qdrant server (e.g., http://localhost:6333)
@@ -43,7 +44,7 @@ class VectorStoreConfig:
 @dataclass
 class CacheConfig:
     """Configuration for caching"""
-    enabled: bool = True
+    enabled: bool = False  # Disabled by default for HF Spaces (No Redis)
     redis_url: str = "redis://localhost:6379/0"
     ttl: int = 3600  # 1 hour default TTL
 
@@ -51,6 +52,8 @@ class CacheConfig:
         env_url = os.getenv("REDIS_URL")
         if env_url:
             self.redis_url = env_url
+            # If explicit URL provided, enable it
+            self.enabled = True
 
 
 @dataclass
@@ -95,7 +98,8 @@ class MemoryConfig:
 @dataclass
 class DataConfig:
     """Configuration for data paths"""
-    data_dir: str = "data/pdfs"
+    # Use /data/pdfs if /data exists (Hugging Face persistent storage), else local data/pdfs
+    data_dir: str = "/data/pdfs" if Path("/data").exists() else "data/pdfs"
     supported_extensions: list = field(default_factory=lambda: [".pdf", ".txt", ".csv", ".xlsx", ".docx", ".json"])
 
 
@@ -115,8 +119,11 @@ class Settings:
     def __post_init__(self):
         """Validate and set derived values"""
         # Ensure directories exist
-        Path(self.data.data_dir).mkdir(parents=True, exist_ok=True)
-        Path(self.vector_store.persist_dir).mkdir(parents=True, exist_ok=True)
+        try:
+            Path(self.data.data_dir).mkdir(parents=True, exist_ok=True)
+            Path(self.vector_store.persist_dir).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            print(f"Warning: Could not create directories: {e}")
 
 
 # Global settings instance

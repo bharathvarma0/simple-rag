@@ -54,7 +54,7 @@ class SimilaritySearch:
         self.cache: Dict[str, List[Dict[str, Any]]] = {}
         
     @cache_result(prefix="search", ttl=3600)
-    def search(self, query: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: Optional[int] = None, filter_doc_id: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Search for similar documents using Optimized Hybrid Search
         1. Check Cache
@@ -66,6 +66,7 @@ class SimilaritySearch:
         Args:
             query: Search query text
             top_k: Number of top results to return (uses config default if None)
+            filter_doc_id: Optional document ID to filter by
             
         Returns:
             List of search results with metadata and distances
@@ -73,19 +74,22 @@ class SimilaritySearch:
         top_k = top_k or self.settings.retrieval.top_k
         
         # 1. Check Cache
+        # Include filter_doc_id in cache key logic (handled by decorator if args included)
         normalized_query = query.strip().lower()
-        if normalized_query in self.cache:
-            logger.info("Retrieval cache hit")
-            return self.cache[normalized_query][:top_k]
+        cache_key = f"{normalized_query}:{filter_doc_id}" if filter_doc_id else normalized_query
         
-        logger.info(f"Searching for: '{query}'")
+        if cache_key in self.cache:
+            logger.info("Retrieval cache hit")
+            return self.cache[cache_key][:top_k]
+        
+        logger.info(f"Searching for: '{query}' (filter_doc_id={filter_doc_id})")
         
         # 2. BM25 Search
         bm25_results = []
         if self.keyword_db.bm25:
             # Get more candidates for fusion
             candidate_k = max(50, top_k * 2)
-            bm25_results = self.keyword_db.search(query, top_k=candidate_k)
+            bm25_results = self.keyword_db.search(query, top_k=candidate_k, filter_doc_id=filter_doc_id)
             logger.info(f"BM25 found {len(bm25_results)} candidates")
         
         # 3. Vector Search
@@ -96,7 +100,8 @@ class SimilaritySearch:
         vector_k = max(50, top_k * 2)
         distances, indices, metadatas = self.vector_db.search(
             query_embedding, 
-            k=vector_k
+            k=vector_k,
+            filter_doc_id=filter_doc_id
         )
         
         vector_results = []
@@ -127,7 +132,7 @@ class SimilaritySearch:
             final_results = fused_results[:top_k]
             
         # Update Cache
-        self.cache[normalized_query] = final_results
+        self.cache[cache_key] = final_results
         
         logger.info(f"Found {len(final_results)} hybrid results")
         return final_results

@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Any
 
 class QueryRequest(BaseModel):
     question: str
+    doc_id: Optional[str] = None
 
 class Source(BaseModel):
     rank: int
