@@ -1,3 +1,4 @@
+
 __pycache__
 *.pyc
 *.pyo
@@ -7,9 +8,12 @@ env/
 venv/
 .env
 .DS_Store
-vector_store/
-*.log
+.git
+.gitignore
+docker-compose.yml
+README.md
 tests/
-debug_qdrant.py
-test_output.txt
-.pytest_cache/
+test_*.py
+data/
+vector_store/
+.gemini/
