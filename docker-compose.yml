@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  rag-app:
+    build: .
+    container_name: adaptive-rag
+    volumes:
+      - ./data:/app/data
+      - ./vector_store:/app/vector_store
+      - ./config:/app/config
+      - ./.env:/app/.env
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"  # For future API
+    command: tail -f /dev/null  # Keep container running for interactive use
+
+  # Optional: Run Ollama in a container if not running on host
+  # ollama:
+  #   image: ollama/ollama
+  #   container_name: ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+
+# volumes:
+#   ollama_data:
