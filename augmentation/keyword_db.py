@@ -126,15 +126,21 @@ class KeywordDatabase:
             logger.warning(f"Keyword database not found at {self.persist_dir}")
             return
         
-        with open(bm25_path, "rb") as f:
-            self.bm25 = pickle.load(f)
-            
-        with open(data_path, "rb") as f:
-            data = pickle.load(f)
-            self.documents = data["documents"]
-            self.metadata = data["metadata"]
-            
-        logger.info(f"Loaded keyword database from {self.persist_dir}")
+        try:
+            with open(bm25_path, "rb") as f:
+                self.bm25 = pickle.load(f)
+                
+            with open(data_path, "rb") as f:
+                data = pickle.load(f)
+                self.documents = data["documents"]
+                self.metadata = data["metadata"]
+                
+            logger.info(f"Loaded keyword database from {self.persist_dir}")
+        except Exception as e:
+            logger.error(f"Failed to load keyword database: {e}")
+            self.bm25 = None
+            self.documents = []
+            self.metadata = []
     
     def exists(self) -> bool:
         """Check if keyword database exists"""

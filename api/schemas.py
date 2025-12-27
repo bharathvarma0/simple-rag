@@ -3,7 +3,6 @@ from typing import List, Optional, Dict, Any
 
 class QueryRequest(BaseModel):
     question: str
-    top_k: Optional[int] = None
 
 class Source(BaseModel):
     rank: int
@@ -18,6 +17,8 @@ class QueryResponse(BaseModel):
     context: str
     num_sources: int
     rewritten_query: Optional[str] = None
+    strategy: Optional[str] = None
+    complexity: Optional[str] = None
 
 class IngestRequest(BaseModel):
     data_dir: Optional[str] = None

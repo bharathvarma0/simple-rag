@@ -12,3 +12,6 @@ python-multipart
 qdrant-client
 pypdf
 pymupdf
+redis
+rank_bm25
+sentence-transformers

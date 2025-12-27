@@ -99,12 +99,11 @@ class BaseStrategy(CoreBaseStrategy):
             f"depth={retrieval_depth}, reranking={use_reranking}"
         )
         
-        # Stage 1 & 2: Retrieve with multi-stage (includes context expansion if depth > 1)
+        # Stage 1: Retrieve using Hybrid Search (BM25 + Vector + RRF + Reranking)
+        # We delegate all retrieval complexity to SimilaritySearch
         results = self.search.search(
             query, 
-            top_k=rerank_candidates if use_reranking else params.top_k,
-            retrieval_depth=retrieval_depth,
-            initial_candidates=initial_candidates
+            top_k=params.top_k
         )
         
         if not results:
@@ -115,11 +114,6 @@ class BaseStrategy(CoreBaseStrategy):
                 "num_sources": 0,
                 "confidence": 0.0
             }
-        
-        # Stage 3: Apply reranking if enabled
-        if use_reranking and self.reranker:
-            logger.info(f"Re-ranking {len(results)} candidates to top {params.top_k}")
-            results = self.reranker.rerank(query, results, top_k=params.top_k)
         
         # Build context
         context = self._build_context(results)

@@ -21,8 +21,8 @@ class EmbeddingConfig:
 @dataclass
 class ChunkingConfig:
     """Configuration for text chunking"""
-    chunk_size: int = 1000
-    chunk_overlap: int = 200
+    chunk_size: int = 500  # Reduced from 1000 to save tokens
+    chunk_overlap: int = 100  # Reduced from 200
     separators: list = field(default_factory=lambda: ["\n\n", "\n", " ", ""])
 
 
@@ -32,6 +32,25 @@ class VectorStoreConfig:
     persist_dir: str = "vector_store"
     index_type: str = "hnsw"  # Options: "flat", "hnsw"
     hnsw_m: int = 32  # Number of connections per node for HNSW
+    url: Optional[str] = None  # URL for Qdrant server (e.g., http://localhost:6333)
+    api_key: Optional[str] = None
+
+    def __post_init__(self):
+        if self.url is None:
+            self.url = os.getenv("QDRANT_URL")
+
+
+@dataclass
+class CacheConfig:
+    """Configuration for caching"""
+    enabled: bool = True
+    redis_url: str = "redis://localhost:6379/0"
+    ttl: int = 3600  # 1 hour default TTL
+
+    def __post_init__(self):
+        env_url = os.getenv("REDIS_URL")
+        if env_url:
+            self.redis_url = env_url
 
 
 @dataclass
@@ -90,6 +109,7 @@ class Settings:
     retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
     reranker: RerankerConfig = field(default_factory=RerankerConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
+    cache: CacheConfig = field(default_factory=CacheConfig)
     data: DataConfig = field(default_factory=DataConfig)
     
     def __post_init__(self):

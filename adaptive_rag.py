@@ -28,6 +28,8 @@ from config import get_settings
 import os
 import yaml
 
+from utils.cache import cache_result
+
 logger = get_logger(__name__)
 
 
@@ -60,9 +62,10 @@ class AdaptiveRAGPipeline:
         if self.vector_db.exists():
             self.vector_db.load()
         else:
-            raise FileNotFoundError(
+            # Don't raise error here, might be starting fresh
+            logger.warning(
                 f"Vector database not found at {self.persist_dir}. "
-                "Please run data ingestion and build the vector database first."
+                "Please run data ingestion."
             )
         
         # Initialize query analyzer
@@ -154,6 +157,7 @@ class AdaptiveRAGPipeline:
         for name, strategy_class in strategies.items():
             self.strategy_selector.register_strategy(name, strategy_class)
     
+    @cache_result(prefix="rag_query", ttl=3600)
     def query(self, question: str) -> Dict[str, Any]:
         """
         Query the adaptive RAG system

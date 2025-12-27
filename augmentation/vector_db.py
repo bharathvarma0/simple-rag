@@ -40,8 +40,16 @@ class VectorDatabase:
         self.persist_dir = ensure_dir(persist_dir)
         self.collection_name = "rag_collection"
         
-        # Initialize Qdrant client (local mode)
-        self.client = QdrantClient(path=str(self.persist_dir))
+        # Initialize Qdrant client
+        if settings.vector_store.url:
+            logger.info(f"Connecting to Qdrant at {settings.vector_store.url}")
+            self.client = QdrantClient(
+                url=settings.vector_store.url, 
+                api_key=settings.vector_store.api_key
+            )
+        else:
+            logger.info(f"Using local Qdrant at {self.persist_dir}")
+            self.client = QdrantClient(path=str(self.persist_dir))
         
         self.embedding_model = embedding_model
         self.embedder = EmbeddingGenerator(model_name=embedding_model)
@@ -72,6 +80,22 @@ class VectorDatabase:
         chunker = DocumentChunker(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         chunks = chunker.chunk_documents(documents)
         
+        self.add_chunks(chunks)
+        
+        logger.info("Vector database built and saved")
+        
+    def add_chunks(self, chunks: List[Any]):
+        """
+        Add pre-chunked documents to the vector database
+        
+        Args:
+            chunks: List of Document objects (chunks)
+        """
+        if not chunks:
+            return
+            
+        logger.info(f"Adding {len(chunks)} chunks to vector database...")
+        
         # Generate embeddings
         texts = [chunk.page_content for chunk in chunks]
         embeddings = self.embedder.generate_embeddings(texts)
@@ -88,13 +112,6 @@ class VectorDatabase:
         
         # Add to index
         self.add_embeddings(embeddings.astype('float32'), metadatas)
-        
-        # Keyword DB (BM25) build removed for modularity/simplification
-        # from augmentation.keyword_db import KeywordDatabase
-        # self.keyword_db = KeywordDatabase(self.persist_dir)
-        # self.keyword_db.build_from_documents(chunks)
-        
-        logger.info("Vector database built and saved")
     
     def add_embeddings(self, embeddings: np.ndarray, metadatas: List[Dict] = None):
         """

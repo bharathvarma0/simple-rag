@@ -5,24 +5,24 @@ providers:
   llm:
     # Priority order - system will try in order until one works
     priority:
-      - ollama
-      - groq
       - openai
+      - groq
+      - ollama
     
     ollama:
       model: "llama3.2"
       base_url: "http://localhost:11434"
-      enabled: true
+      enabled: false
       
     groq:
       model: "llama-3.1-70b-versatile"
       api_key_env: "GROQ_API_KEY"
-      enabled: true
+      enabled: false
       
     openai:
-      model: "gpt-4-turbo-preview"
+      model: "gpt-4o-mini"
       api_key_env: "OPENAI_API_KEY"
-      enabled: false
+      enabled: true
   
   embedding:
     priority:
@@ -31,9 +31,9 @@ providers:
     
     local:
       model: "all-MiniLM-L6-v2"
-      enabled: true
+      enabled: false
       
     openai:
-      model: "text-embedding-3-large"
+      model: "text-embedding-3-small"
       api_key_env: "OPENAI_API_KEY"
-      enabled: false
+      enabled: true

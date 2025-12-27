@@ -1,240 +1,101 @@
-# Traditional RAG System
+# Production-Grade Adaptive RAG System
 
-A clean, modular implementation of a Retrieval-Augmented Generation (RAG) system for document question-answering.
+A high-performance, production-ready Adaptive RAG system that competes with state-of-the-art solutions like Perplexity and OpenAI's reasoning models.
 
-## 📁 Project Structure
+## 🌟 Key Features
 
-```
-RAG-Tutorials/
-├── components/              # Reusable components
-│   ├── __init__.py
-│   ├── loaders.py          # Document loaders (PDF, TXT, CSV, etc.)
-│   ├── chunkers.py         # Text chunking utilities
-│   └── embedders.py        # Embedding generation
-├── data/                   # Data storage
-│   └── pdfs/              # Place your PDF files here
-├── data_ingestion/         # Data ingestion scripts
-│   ├── __init__.py
-│   └── ingest.py          # Main ingestion script
-├── augmentation/          # Vector database and similarity search
-│   ├── __init__.py
-│   ├── vector_db.py      # Qdrant vector database management
-│   └── search.py         # Similarity search utilities
-├── generation/            # LLM generation
-│   ├── __init__.py
-│   └── rag.py            # RAG pipeline (retrieval + generation)
-├── vector_store/         # Generated vector store (created automatically)
-├── api/                  # API endpoints
-│   ├── main.py           # FastAPI application entry point
-│   └── routes.py         # API routes
-├── requirements.txt      # Python dependencies
-└── README.md            # This file
-```
+- **Adaptive Routing**: Intelligently routes queries to the best strategy (Simple Fact, Complex Reasoning, Comparison, Summary).
+- **Hybrid Search**: Combines **BM25 Keyword Search** and **Qdrant Vector Search** using **Reciprocal Rank Fusion (RRF)** for superior retrieval accuracy.
+- **Advanced Reranking**: Uses Cross-Encoders to rerank retrieved documents, ensuring the most relevant context is used.
+- **High Performance**:
+    - **Async I/O**: Optimized API handling for high concurrency.
+    - **Redis Caching**: Caches search results, embeddings, and LLM responses for sub-second latency.
+- **Production Infrastructure**: Fully containerized with Docker (FastAPI + Qdrant + Redis).
+- **Multi-Provider Support**: Seamlessly switch between OpenAI, Groq, and Ollama.
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 1. Installation
+### 1. Prerequisites
+- Docker & Docker Compose
+- OpenAI API Key (or Groq/Ollama)
 
-#### Local Installation
+### 2. Setup Environment
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+cp .env.example .env
+# Edit .env and add your API keys
 ```
 
-#### Docker Installation
+### 3. Start System
 ```bash
-# Build the image
-docker build -t rag-tutorial .
-
-# Run the container
-docker run -it --env-file .env -v $(pwd)/data:/app/data -v $(pwd)/vector_store:/app/vector_store rag-tutorial
+./start_app.sh
 ```
+This will start:
+- **RAG API**: http://localhost:8000
+- **Qdrant Vector DB**: http://localhost:6333
+- **Redis Cache**: http://localhost:6379
 
-### 2. Set Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-OPENAI_API_KEY=your_openai_api_key_here
-```
-
-Get your API key from: https://platform.openai.com/
-
-### 3. Add Your Documents
-
-Place your PDF files (or other supported formats) in the `data/pdfs/` directory:
-
+### 4. Ingest Data
+Place your PDFs in `data/pdfs` and run:
 ```bash
-mkdir -p data/pdfs
-# Copy your PDF files to data/pdfs/
+curl -X POST "http://localhost:8000/api/v1/ingest" \
+     -H "Content-Type: application/json" \
+     -d '{"data_dir": "data/pdfs"}'
 ```
 
-### 4. Build Vector Store
-
+### 5. Query
 ```bash
-# Build vector store from documents
-python app.py --build --data-dir data/pdfs
+curl -X POST "http://localhost:8000/api/v1/query" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "What are the key changes in the 2026 F1 regulations?"}'
 ```
 
-### 5. Query the System
+## 🏗 Architecture
 
+```mermaid
+graph TD
+    User[User Query] --> API[FastAPI Gateway]
+    API --> Cache[Redis Cache]
+    Cache -- Hit --> API
+    Cache -- Miss --> Router[Query Router]
+    
+    Router --> Strategy{Select Strategy}
+    Strategy -->|Simple| Vector[Vector Search]
+    Strategy -->|Complex| Hybrid[Hybrid Search]
+    
+    Hybrid --> BM25[Keyword Search]
+    Hybrid --> Qdrant[Vector Search]
+    
+    BM25 & Qdrant --> RRF[Rank Fusion]
+    RRF --> Rerank[Cross-Encoder Reranker]
+    
+    Rerank --> LLM[LLM Generation]
+    LLM --> API
+```
+
+## 🛠 Configuration
+
+### Strategies (`config/strategies.yaml`)
+Customize behavior for different query types:
+- **Simple Fact**: Fast retrieval, no reranking.
+- **Reasoning**: Deep retrieval, chain-of-thought prompting.
+- **Comparison**: Multi-entity retrieval.
+
+### Providers (`config/providers.yaml`)
+Configure LLM and Embedding providers:
+- **LLM**: OpenAI GPT-4, Groq Llama 3, Ollama
+- **Embeddings**: OpenAI, Local (HuggingFace)
+
+## 📦 Tech Stack
+
+- **Backend**: Python 3.12, FastAPI
+- **Vector DB**: Qdrant
+- **Cache**: Redis
+- **Search**: BM25 + Qdrant + Cross-Encoders
+- **LLM Orchestration**: Custom Adaptive Pipeline
+
+## 🧪 Testing
+
+Run the test suite:
 ```bash
-# Query with a question
-python app.py --query "What is attention mechanism?"
-
-# Interactive mode (default)
-python app.py
+python test_adaptive.py
 ```
-
-## 📖 Usage
-
-### API Usage
-
-The system exposes a FastAPI interface.
-
-```bash
-# Start the API
-uvicorn api.main:app --host 0.0.0.0 --port 8000
-```
-
-Visit `http://localhost:8000/docs` for the interactive API documentation.
-
-### Python API
-
-```python
-from generation.rag import RAGPipeline
-
-# Initialize RAG pipeline
-rag = RAGPipeline(persist_dir="vector_store")
-
-# Query the system
-result = rag.query("What is your question?", top_k=5)
-
-# Get answer
-answer = result["answer"]
-sources = result["sources"]
-context = result["context"]
-
-# Simple query (just answer)
-answer = rag.ask("What is your question?")
-```
-
-### Build Vector Store Programmatically
-
-```python
-from data_ingestion.ingest import ingest_documents
-from augmentation.vector_db import VectorDatabase
-
-# Ingest documents
-raw_docs, chunks = ingest_documents("data/pdfs")
-
-# Build vector database
-vector_db = VectorDatabase(persist_dir="vector_store")
-vector_db.build_from_documents(raw_docs)
-```
-
-## 🧩 Components
-
-### Document Loaders (`components/loaders.py`)
-- Supports: PDF, TXT, CSV, Excel (.xlsx), Word (.docx), JSON
-- Automatically finds and loads all supported files from directory
-
-### Text Chunkers (`components/chunkers.py`)
-- Splits documents into smaller chunks
-- Configurable chunk size and overlap
-
-### Embedding Generators (`components/embedders.py`)
-- Uses OpenAI Embeddings
-- Model: `text-embedding-3-small` (1536 dimensions)
-
-### Vector Database (`augmentation/vector_db.py`)
-- Qdrant-based vector storage
-- Persistent storage to disk
-- Automatic loading and saving
-
-### Similarity Search (`augmentation/search.py`)
-- Semantic search in vector database
-- Returns top-k similar documents
-- Configurable similarity thresholds
-
-### RAG Pipeline (`generation/rag.py`)
-- Traditional RAG: Retrieve → Generate
-- Uses OpenAI LLM for generation
-- Returns answers with source citations
-
-## ⚙️ Configuration
-
-### Vector Store Settings
-
-Edit `augmentation/vector_db.py`:
-- `persist_dir`: Directory for vector store
-- `embedding_model`: Embedding model name
-
-### Chunking Settings
-
-Edit `data_ingestion/ingest.py`:
-- `chunk_size`: Size of text chunks (default: 1000)
-- `chunk_overlap`: Overlap between chunks (default: 200)
-
-### LLM Settings
-
-Edit `generation/rag.py`:
-- `llm_model`: OpenAI model name (default: `gpt-4o-mini`)
-- `temperature`: LLM temperature (default: 0.1)
-- `max_tokens`: Maximum tokens (default: 1024)
-
-## 📝 Supported File Formats
-
-- **PDF** (`.pdf`) - Using PyPDFLoader
-- **Text** (`.txt`) - Using TextLoader
-- **CSV** (`.csv`) - Using CSVLoader
-- **Excel** (`.xlsx`) - Using UnstructuredExcelLoader
-- **Word** (`.docx`) - Using Docx2txtLoader
-- **JSON** (`.json`) - Using JSONLoader
-
-## 🔧 Dependencies
-
-- `langchain` - Document processing framework
-- `langchain-openai` - OpenAI integration
-- `openai` - OpenAI SDK
-- `qdrant-client` - Vector database
-- `pypdf` / `pymupdf` - PDF processing
-
-## 📋 Workflow
-
-1. **Data Ingestion**: Load documents from `data/pdfs/`
-2. **Chunking**: Split documents into smaller pieces
-3. **Embedding**: Generate vector embeddings
-4. **Vector Storage**: Store in FAISS database
-5. **Query**: User asks a question
-6. **Retrieval**: Find similar documents
-7. **Generation**: LLM generates answer from context
-8. **Response**: Return answer with sources
-
-## 🐛 Troubleshooting
-
-### Vector Store Not Found
-```bash
-# Build the vector store first
-python app.py --build
-```
-
-### OPENAI_API_KEY Not Found
-```bash
-# Create .env file with your API key
-echo "OPENAI_API_KEY=your_key_here" > .env
-```
-
-### No Documents Found
-```bash
-# Make sure PDFs are in data/pdfs/
-ls data/pdfs/
-```
-
-## 📄 License
-
-GNU General Public License v3.0
-
-## 🤝 Contributing
-
-This is a clean, modular RAG implementation. Feel free to extend and modify for your needs!

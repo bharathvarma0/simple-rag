@@ -8,6 +8,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 from langchain_community.document_loaders import (
+    PyPDFLoader as PDFLoader,
     PyPDFLoader, 
     TextLoader, 
     CSVLoader,
