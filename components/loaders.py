@@ -3,7 +3,7 @@ Document loaders for various file formats
 """
 
 from pathlib import Path
-from typing import List, Any
+from typing import List, Any, Optional
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -120,12 +120,13 @@ class DocumentLoader:
         return documents
 
 
-def load_pdfs_from_dir(data_dir: str) -> List[Any]:
+def load_pdfs_from_dir(data_dir: str, only_files: Optional[List[str]] = None) -> List[Any]:
     """
     Load PDFs from a directory
     
     Args:
         data_dir: Directory containing PDFs
+        only_files: Optional list of filenames to load (if None, loads all)
         
     Returns:
         List of LangChain Document objects
@@ -140,13 +141,22 @@ def load_pdfs_from_dir(data_dir: str) -> List[Any]:
     logger.info(f"Scanning for PDFs in: {pdf_dir.resolve()}")
     
     # Glob for PDF files
-    pdf_files = list(pdf_dir.glob("*.pdf"))
+    if only_files:
+        pdf_files = [pdf_dir / f for f in only_files if (pdf_dir / f).exists()]
+        logger.info(f"Loading specific files: {only_files}")
+    else:
+        pdf_files = list(pdf_dir.glob("*.pdf"))
+    
     logger.info(f"Found {len(pdf_files)} PDF files")
     
     for pdf_path in pdf_files:
         try:
             loader = PyPDFLoader(str(pdf_path))
             docs = loader.load()
+            # Overwrite source metadata to be just the filename
+            for doc in docs:
+                doc.metadata["source"] = pdf_path.name
+                
             logger.info(f"Loaded {len(docs)} pages from {pdf_path.name}")
             documents.extend(docs)
         except Exception as e:

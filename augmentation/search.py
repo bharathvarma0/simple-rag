@@ -52,7 +52,7 @@ class SimilaritySearch:
             else:
                 logger.warning("sentence-transformers not installed, reranking disabled")
     
-    def search(self, query: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: Optional[int] = None, filter_metadata: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Search for similar documents using Optimized Hybrid Search
         1. Check Cache
@@ -112,10 +112,27 @@ class SimilaritySearch:
         # We need enough vector results to fuse
         vector_k = top_k * 2 if not filter_ids else len(filter_ids)
         
+        # Construct Qdrant filter if metadata filter is provided
+        qdrant_filter = None
+        if filter_metadata:
+            from qdrant_client import models
+            conditions = []
+            for key, value in filter_metadata.items():
+                conditions.append(
+                    models.FieldCondition(
+                        key=key,
+                        match=models.MatchValue(value=value)
+                    )
+                )
+            if conditions:
+                qdrant_filter = models.Filter(must=conditions)
+                logger.info(f"Applying Qdrant filter: {filter_metadata}")
+        
         distances, indices, metadatas = self.vector_db.search(
             query_embedding, 
             k=vector_k, 
-            filter_ids=filter_ids
+            filter_ids=filter_ids,
+            query_filter=qdrant_filter
         )
         
         vector_results = {}

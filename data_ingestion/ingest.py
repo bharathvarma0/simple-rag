@@ -21,7 +21,8 @@ logger = get_logger(__name__)
 def ingest_documents(
     data_dir: Optional[str] = None,
     chunk_size: Optional[int] = None,
-    chunk_overlap: Optional[int] = None
+    chunk_overlap: Optional[int] = None,
+    only_files: Optional[List[str]] = None
 ) -> Tuple[Optional[List[Any]], Optional[List[Any]]]:
     """
     Ingest documents from data directory
@@ -30,6 +31,7 @@ def ingest_documents(
         data_dir: Path to directory containing documents (uses config default if None)
         chunk_size: Size of text chunks (uses config default if None)
         chunk_overlap: Overlap between chunks (uses config default if None)
+        only_files: Optional list of filenames to ingest (if None, ingests all)
         
     Returns:
         Tuple of (raw_documents, chunked_documents)
@@ -41,11 +43,13 @@ def ingest_documents(
     
     logger.info("=" * 60)
     logger.info("Starting Data Ingestion")
+    if only_files:
+        logger.info(f"Targeting specific files: {only_files}")
     logger.info("=" * 60)
     
     # Load documents using the new explicit loader
     from components.loaders import load_pdfs_from_dir
-    raw_documents = load_pdfs_from_dir(data_dir)
+    raw_documents = load_pdfs_from_dir(data_dir, only_files=only_files)
     
     if not raw_documents:
         logger.error("No documents found or processed!")

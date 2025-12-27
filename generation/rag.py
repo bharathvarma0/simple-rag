@@ -86,7 +86,7 @@ class RAGPipeline:
         
         logger.info(f"RAG pipeline initialized with LLM: {self.llm.model_name}")
     
-    def query(self, question: str, top_k: Optional[int] = None) -> Dict[str, Any]:
+    def query(self, question: str, top_k: Optional[int] = None, document_name: Optional[str] = None) -> Dict[str, Any]:
         """
         Query the RAG system
         
@@ -113,7 +113,8 @@ class RAGPipeline:
         
         # Retrieve relevant documents using search_query
         # We request more than needed to allow for dynamic filtering
-        results = self.search.search(search_query, top_k=top_k * 2)
+        filter_metadata = {"source": document_name} if document_name else None
+        results = self.search.search(search_query, top_k=top_k * 2, filter_metadata=filter_metadata)
         
         if not results:
             logger.warning("No relevant documents found")

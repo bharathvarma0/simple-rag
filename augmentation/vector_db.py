@@ -149,7 +149,7 @@ class VectorDatabase:
         
         logger.info(f"Added {len(points)} vectors to database")
     
-    def search(self, query_embedding: np.ndarray, k: int = 5, filter_ids: Optional[List[int]] = None) -> Tuple[List[float], List[int], List[Dict]]:
+    def search(self, query_embedding: np.ndarray, k: int = 5, filter_ids: Optional[List[int]] = None, query_filter: Optional[Any] = None) -> Tuple[List[float], List[int], List[Dict]]:
         """
         Search for similar vectors
         
@@ -157,22 +157,34 @@ class VectorDatabase:
             query_embedding: Query vector
             k: Number of results
             filter_ids: Optional list of chunk IDs to filter by (for optimization)
+            query_filter: Optional Qdrant Filter object (from models.Filter)
             
         Returns:
             Tuple of (distances, indices, metadatas)
             Note: indices here will be the chunk_ids from payload, not Qdrant UUIDs
         """
         search_filter = None
+        
+        # Combine filters if both are present
+        conditions = []
+        
         if filter_ids is not None:
-            # Create a filter for chunk_ids
-            search_filter = models.Filter(
-                must=[
-                    models.FieldCondition(
-                        key="chunk_id",
-                        match=models.MatchAny(any=filter_ids)
-                    )
-                ]
-            )
+             conditions.append(
+                models.FieldCondition(
+                    key="chunk_id",
+                    match=models.MatchAny(any=filter_ids)
+                )
+             )
+             
+        if query_filter:
+            # If query_filter is already a Filter object with 'must', extend our conditions
+            if hasattr(query_filter, 'must') and query_filter.must:
+                conditions.extend(query_filter.must)
+            # If it has other conditions (should, must_not), we might need more complex logic
+            # For now, we assume simple 'must' filters from search.py
+            
+        if conditions:
+            search_filter = models.Filter(must=conditions)
             
         # Use query_points instead of search (which is deprecated/removed)
         response = self.client.query_points(

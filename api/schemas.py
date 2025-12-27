@@ -4,6 +4,7 @@ from typing import List, Optional, Dict, Any
 class QueryRequest(BaseModel):
     question: str
     top_k: Optional[int] = None
+    document_name: Optional[str] = None
 
 class Source(BaseModel):
     rank: int
