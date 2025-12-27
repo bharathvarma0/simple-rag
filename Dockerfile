@@ -26,4 +26,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY --chown=user . .
 
 # Run uvicorn directly to ensure proper signal handling and port binding
-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
