@@ -27,6 +27,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root health check for Railway
+@app.get("/")
+def health():
+    return {"status": "ok"}
+
 # Include router
 app.include_router(router, prefix="/api/v1")
 
